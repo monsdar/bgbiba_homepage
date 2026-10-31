@@ -1,0 +1,4 @@
+{{- $leagueId := .Get "league_id" -}}
+{{- $limit := .Get "limit" | default 10 | int -}}
+{{- $onlyBiba := .Get "only_biba" | default false -}}
+{{ partial "teamsl-matches.html" (dict "league_id" $leagueId "limit" $limit "only_biba" $onlyBiba) }}

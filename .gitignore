@@ -1,0 +1,14 @@
+# Hugo default output directories
+/public/
+/resources/_gen/
+.hugo_build.lock
+
+# OS metadata
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Environment / Secrets (Never commit secrets!)
+.env
+.env.*
+!.env.example

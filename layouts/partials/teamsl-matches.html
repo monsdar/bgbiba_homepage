@@ -1,0 +1,116 @@
+{{/*
+  TeamSL DBB Matches Component
+  Fetches live DBB matches from TeamSL API or uses local mock data if offline/local.
+*/}}
+
+{{- $leagueId := .league_id -}}
+{{- $limit := .limit | default 10 | int -}}
+{{- $onlyBiba := .only_biba | default false -}}
+{{- $apiBase := site.Params.slapi_url | default "https://slapi.up.railway.app" | strings.TrimRight "/" -}}
+{{- $token := os.Getenv "SLAPI_TOKEN" | default (os.Getenv "TEAMSL_API_TOKEN") -}}
+
+{{- $matches := slice -}}
+{{- $isLive := false -}}
+
+{{- if and $token $leagueId -}}
+  {{- $endpoint := printf "%s/leagues/%v/matches" $apiBase $leagueId -}}
+  {{- $headers := dict "Authorization" (printf "Bearer %s" $token) -}}
+  {{- $res := resources.GetRemote $endpoint (dict "headers" $headers) -}}
+  {{- if and $res (not $res.Err) -}}
+    {{- $json := $res | transform.Unmarshal -}}
+    {{- with $json.matches -}}
+      {{- $matches = . -}}
+      {{- $isLive = true -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if eq (len $matches) 0 -}}
+  {{/* Fallback to local sample matches */}}
+  {{- $fallback := resources.Get "data/sample-matches.json" -}}
+  {{- if $fallback -}}
+    {{- $json := $fallback | transform.Unmarshal -}}
+    {{- with $json.matches -}}
+      {{- $matches = . -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+<div class="teamsl-matches-wrapper">
+  <div class="matches-header">
+    <div class="header-titles">
+      <span class="badge badge-primary">DBB Spielbetrieb</span>
+      {{- if $isLive -}}
+        <span class="badge badge-live">● Live Sync</span>
+      {{- else -}}
+        <span class="badge badge-demo">Vorschau</span>
+      {{- end -}}
+    </div>
+  </div>
+
+  <div class="matches-list">
+    {{- $count := 0 -}}
+    {{- range $matches -}}
+      {{- $home := .home_team.name -}}
+      {{- $away := .away_team.name -}}
+      {{- $isBibaHome := in (lower $home) "biba" -}}
+      {{- $isBibaAway := in (lower $away) "biba" -}}
+      
+      {{- $include := true -}}
+      {{- if $onlyBiba -}}
+        {{- if not (or $isBibaHome $isBibaAway) -}}
+          {{- $include = false -}}
+        {{- end -}}
+      {{- end -}}
+
+      {{- if and $include (lt $count $limit) -}}
+        {{- $count = add $count 1 -}}
+        
+        {{/* Datumsformatierung */}}
+        {{- $dt := time .datetime -}}
+        {{- $dateStr := $dt.Format "02.01.2006" -}}
+        {{- $timeStr := $dt.Format "15:04" -}}
+
+        <div class="match-card {{ if or $isBibaHome $isBibaAway }}match-biba{{ end }}">
+          <div class="match-meta">
+            <span class="match-date">{{ $dateStr }}</span>
+            <span class="match-time">{{ $timeStr }} Uhr</span>
+            {{- with .location -}}
+              <span class="match-venue" title="{{ . }}">📍 {{ . }}</span>
+            {{- end -}}
+          </div>
+
+          <div class="match-teams-box">
+            <div class="team team-home {{ if $isBibaHome }}is-biba{{ end }}">
+              <span class="team-name">{{ $home }}</span>
+              {{- if .is_finished -}}
+                <span class="team-score">{{ .score_home }}</span>
+              {{- end -}}
+            </div>
+
+            <div class="match-versus">
+              {{- if .is_finished -}}
+                <span class="badge badge-final">Endstand</span>
+              {{- else if .is_cancelled -}}
+                <span class="badge badge-cancelled">Abgesagt</span>
+              {{- else -}}
+                <span class="badge badge-vs">VS</span>
+              {{- end -}}
+            </div>
+
+            <div class="team team-away {{ if $isBibaAway }}is-biba{{ end }}">
+              <span class="team-name">{{ $away }}</span>
+              {{- if .is_finished -}}
+                <span class="team-score">{{ .score_away }}</span>
+              {{- end -}}
+            </div>
+          </div>
+        </div>
+      {{- end -}}
+    {{- end -}}
+
+    {{- if eq $count 0 -}}
+      <p class="text-muted">Keine Spiele für die gewählten Kriterien gefunden.</p>
+    {{- end -}}
+  </div>
+</div>

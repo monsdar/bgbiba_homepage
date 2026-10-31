@@ -1,0 +1,87 @@
+{{/*
+  TeamSL DBB Standings Component
+  Fetches live DBB league standings from TeamSL API or uses local mock data if offline/local.
+*/}}
+
+{{- $leagueId := .league_id -}}
+{{- $apiBase := site.Params.slapi_url | default "https://slapi.up.railway.app" | strings.TrimRight "/" -}}
+{{- $token := os.Getenv "SLAPI_TOKEN" | default (os.Getenv "TEAMSL_API_TOKEN") -}}
+
+{{- $standings := slice -}}
+{{- $isLive := false -}}
+
+{{- if and $token $leagueId -}}
+  {{- $endpoint := printf "%s/leagues/%v/standings" $apiBase $leagueId -}}
+  {{- $headers := dict "Authorization" (printf "Bearer %s" $token) -}}
+  {{- $res := resources.GetRemote $endpoint (dict "headers" $headers) -}}
+  {{- if and $res (not $res.Err) -}}
+    {{- $json := $res | transform.Unmarshal -}}
+    {{- with $json.standings -}}
+      {{- $standings = . -}}
+      {{- $isLive = true -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if eq (len $standings) 0 -}}
+  {{/* Fallback to local sample standings */}}
+  {{- $fallback := resources.Get "data/sample-standings.json" -}}
+  {{- if $fallback -}}
+    {{- $json := $fallback | transform.Unmarshal -}}
+    {{- with $json.standings -}}
+      {{- $standings = . -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+
+<div class="teamsl-standings-wrapper">
+  <div class="standings-header">
+    <div class="header-titles">
+      <span class="badge badge-primary">Tabelle</span>
+      {{- if $isLive -}}
+        <span class="badge badge-live">● Live Sync</span>
+      {{- else -}}
+        <span class="badge badge-demo">Vorschau</span>
+      {{- end -}}
+    </div>
+  </div>
+
+  <div class="table-responsive">
+    <table class="standings-table">
+      <thead>
+        <tr>
+          <th class="col-pos">#</th>
+          <th class="col-team">Team</th>
+          <th class="col-stat text-center">Spiele</th>
+          <th class="col-stat text-center">S</th>
+          <th class="col-stat text-center">N</th>
+          <th class="col-stat text-center">Körbe</th>
+          <th class="col-stat text-center">Diff</th>
+          <th class="col-stat text-center font-bold">Punkte</th>
+        </tr>
+      </thead>
+      <tbody>
+        {{- range $standings -}}
+          {{- $teamName := .team.name -}}
+          {{- $isBiba := in (lower $teamName) "biba" -}}
+          {{- $games := add .wins .losses -}}
+          <tr class="{{ if $isBiba }}highlight-biba{{ end }}">
+            <td class="col-pos font-bold">{{ .position }}</td>
+            <td class="col-team {{ if $isBiba }}team-biba{{ end }}">
+              {{ $teamName }}
+              {{ if $isBiba }}<span class="badge badge-small-biba">BG BiBA</span>{{ end }}
+            </td>
+            <td class="col-stat text-center">{{ $games }}</td>
+            <td class="col-stat text-center stat-win">{{ .wins }}</td>
+            <td class="col-stat text-center stat-loss">{{ .losses }}</td>
+            <td class="col-stat text-center text-muted">{{ .points_for }}:{{ .points_against }}</td>
+            <td class="col-stat text-center font-mono">
+              {{- if gt .point_difference 0 }}+{{ .point_difference }}{{ else }}{{ .point_difference }}{{ end -}}
+            </td>
+            <td class="col-stat text-center font-bold font-primary">{{ .win_points }}:{{ .loss_points }}</td>
+          </tr>
+        {{- end -}}
+      </tbody>
+    </table>
+  </div>
+</div>

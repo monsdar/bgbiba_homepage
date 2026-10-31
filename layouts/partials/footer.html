@@ -1,0 +1,53 @@
+<footer class="footer">
+  <div class="container">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <img src="{{ site.Params.logo_dark }}" alt="{{ site.Title }} Logo" class="footer-logo">
+        <p>{{ site.Params.description }}</p>
+        <div class="footer-socials">
+          <a href="{{ site.Params.instagram }}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">Instagram</a>
+          <a href="{{ site.Params.facebook }}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">Facebook</a>
+          <a href="{{ site.Params.whatsapp }}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">WhatsApp</a>
+        </div>
+      </div>
+
+      <div class="footer-col">
+        <h4>Navigation</h4>
+        <ul class="footer-links">
+          <li><a href="/">Startseite</a></li>
+          <li><a href="/teams/">Teams & Jugend</a></li>
+          <li><a href="/spielbetrieb/">Spielbetrieb & Tabellen</a></li>
+          <li><a href="/verein/">Über uns</a></li>
+          <li><a href="/hallen/">Trainingshallen</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Stammvereine</h4>
+        <ul class="footer-links">
+          {{ range site.Params.stammvereine }}
+            <li><a href="{{ .url }}" target="_blank" rel="noopener">{{ .name }} ↗</a></li>
+          {{ end }}
+          <li style="margin-top: 0.5rem;"><a href="{{ site.Params.foerderverein }}" target="_blank" rel="noopener">Förderverein Bballer4life ↗</a></li>
+        </ul>
+      </div>
+
+      <div class="footer-col">
+        <h4>Rechtliches</h4>
+        <ul class="footer-links">
+          <li><a href="/impressum/">Impressum</a></li>
+          <li><a href="/datenschutz/">Datenschutz</a></li>
+          <li><a href="javascript:void(0)" onclick="openCookieSettings()">Cookie-Einstellungen</a></li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <p>&copy; {{ now.Format "2006" }} {{ site.Params.club_name }}. Alle Rechte vorbehalten.</p>
+      <div class="footer-bottom-links">
+        <a href="/impressum/">Impressum</a>
+        <a href="/datenschutz/">Datenschutz</a>
+      </div>
+    </div>
+  </div>
+</footer>

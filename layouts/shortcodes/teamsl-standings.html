@@ -1,0 +1,2 @@
+{{- $leagueId := .Get "league_id" -}}
+{{ partial "teamsl-standings.html" (dict "league_id" $leagueId) }}

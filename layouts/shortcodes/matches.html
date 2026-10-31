@@ -1,0 +1,3 @@
+{{- $url := .Get "url" -}}
+{{- $limit := .Get "limit" | default 20 | int -}}
+{{ partial "matches.html" (dict "url" $url "limit" $limit) }}

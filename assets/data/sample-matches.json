@@ -1,0 +1,69 @@
+{
+  "league_id": "sample-league",
+  "matches": [
+    {
+      "match_id": 101,
+      "match_day": 1,
+      "match_no": 1201,
+      "datetime": "2024-11-09T16:00:00",
+      "home_team": { "name": "BG BiBA" },
+      "away_team": { "name": "Bremen 1860 II" },
+      "location": "Waldsporthalle Achim",
+      "score": "74:68",
+      "score_home": 74,
+      "score_away": 68,
+      "is_finished": true,
+      "is_confirmed": true,
+      "is_cancelled": false,
+      "is_forfeit": false
+    },
+    {
+      "match_id": 102,
+      "match_day": 2,
+      "match_no": 1202,
+      "datetime": "2024-11-16T18:00:00",
+      "home_team": { "name": "Eisbären Bremerhaven III" },
+      "away_team": { "name": "BG BiBA" },
+      "location": "Sporthalle Bremerhaven",
+      "score": null,
+      "score_home": null,
+      "score_away": null,
+      "is_finished": false,
+      "is_confirmed": false,
+      "is_cancelled": false,
+      "is_forfeit": false
+    },
+    {
+      "match_id": 103,
+      "match_day": 3,
+      "match_no": 1203,
+      "datetime": "2024-11-23T15:30:00",
+      "home_team": { "name": "BG BiBA" },
+      "away_team": { "name": "Rotenburg/Scheeßel" },
+      "location": "Gymnasium Achim",
+      "score": null,
+      "score_home": null,
+      "score_away": null,
+      "is_finished": false,
+      "is_confirmed": false,
+      "is_cancelled": false,
+      "is_forfeit": false
+    },
+    {
+      "match_id": 104,
+      "match_day": 4,
+      "match_no": 1204,
+      "datetime": "2024-11-30T17:00:00",
+      "home_team": { "name": "TSV Lesum-Burgdamm" },
+      "away_team": { "name": "BG BiBA" },
+      "location": "Sportzentrum Lesum",
+      "score": null,
+      "score_home": null,
+      "score_away": null,
+      "is_finished": false,
+      "is_confirmed": false,
+      "is_cancelled": false,
+      "is_forfeit": false
+    }
+  ]
+}

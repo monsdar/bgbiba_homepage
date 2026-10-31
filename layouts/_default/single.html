@@ -1,0 +1,19 @@
+{{ define "main" }}
+<div class="container section">
+  <article class="page-article">
+    <header class="page-header" style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;">
+      <div style="font-size: 0.85rem; color: var(--color-accent); font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem;">
+        {{ with .Section }}{{ . | humanize }}{{ else }}BG BiBA{{ end }}
+      </div>
+      <h1 class="page-title" style="font-size: 2.5rem; margin-bottom: 0.5rem;">{{ .Title }}</h1>
+      {{ with .Description }}
+        <p class="page-description text-muted" style="font-size: 1.15rem;">{{ . }}</p>
+      {{ end }}
+    </header>
+
+    <div class="page-content" style="font-size: 1.05rem; line-height: 1.75; max-width: 840px;">
+      {{ .Content }}
+    </div>
+  </article>
+</div>
+{{ end }}

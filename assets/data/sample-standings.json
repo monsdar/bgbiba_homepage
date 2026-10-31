@@ -1,0 +1,60 @@
+{
+  "league_id": "sample-league",
+  "standings": [
+    {
+      "position": 1,
+      "team": { "name": "BG BiBA" },
+      "wins": 4,
+      "losses": 0,
+      "points_for": 312,
+      "points_against": 245,
+      "point_difference": 67,
+      "win_points": 8,
+      "loss_points": 0
+    },
+    {
+      "position": 2,
+      "team": { "name": "Bremen 1860 II" },
+      "wins": 3,
+      "losses": 1,
+      "points_for": 280,
+      "points_against": 260,
+      "point_difference": 20,
+      "win_points": 6,
+      "loss_points": 2
+    },
+    {
+      "position": 3,
+      "team": { "name": "Eisbären Bremerhaven III" },
+      "wins": 2,
+      "losses": 2,
+      "points_for": 270,
+      "points_against": 268,
+      "point_difference": 2,
+      "win_points": 4,
+      "loss_points": 4
+    },
+    {
+      "position": 4,
+      "team": { "name": "Rotenburg/Scheeßel" },
+      "wins": 1,
+      "losses": 3,
+      "points_for": 230,
+      "points_against": 280,
+      "point_difference": -50,
+      "win_points": 2,
+      "loss_points": 6
+    },
+    {
+      "position": 5,
+      "team": { "name": "TSV Lesum-Burgdamm" },
+      "wins": 0,
+      "losses": 4,
+      "points_for": 210,
+      "points_against": 249,
+      "point_difference": -39,
+      "win_points": 0,
+      "loss_points": 8
+    }
+  ]
+}

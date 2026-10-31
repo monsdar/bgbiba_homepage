@@ -1,0 +1,67 @@
+{{- $gaId := os.Getenv "GA_MEASUREMENT_ID" | default site.Params.ga_measurement_id -}}
+
+<div id="cookie-banner" class="cookie-banner" role="dialog" aria-labelledby="cookie-title" aria-describedby="cookie-desc">
+  <h3 id="cookie-title">🍪 Privatsphäre-Einstellungen</h3>
+  <p id="cookie-desc">
+    Wir nutzen Cookies, um unsere Website für dich optimal zu gestalten. Statistische Auswertungen (Google Analytics) erfolgen nur mit deiner ausdrücklichen Einwilligung. Weitere Informationen findest du in unserer <a href="/datenschutz/">Datenschutzerklärung</a>.
+  </p>
+  <div class="cookie-actions">
+    <button type="button" class="btn btn-secondary" onclick="handleCookieConsent('essential')">Nur essenzielle</button>
+    <button type="button" class="btn btn-primary" onclick="handleCookieConsent('all')">Alle akzeptieren</button>
+  </div>
+</div>
+
+<script>
+  (function() {
+    var gaId = {{ $gaId | default "" }};
+    var consentKey = 'bgbiba_cookie_consent';
+    var banner = document.getElementById('cookie-banner');
+
+    function loadGoogleAnalytics(id) {
+      if (!id || window.gaLoaded) return;
+      window.gaLoaded = true;
+
+      var script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
+      document.head.appendChild(script);
+
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){ dataLayer.push(arguments); }
+      window.gtag = gtag;
+      gtag('js', new Date());
+      gtag('config', id, { 'anonymize_ip': true });
+      console.log('Google Analytics aktiv.');
+    }
+
+    window.handleCookieConsent = function(type) {
+      localStorage.setItem(consentKey, type);
+      if (banner) banner.classList.remove('show');
+      if (type === 'all' && gaId) {
+        loadGoogleAnalytics(gaId);
+      }
+    };
+
+    window.openCookieSettings = function() {
+      if (banner) banner.classList.add('show');
+    };
+
+    var storedConsent = localStorage.getItem(consentKey);
+    if (!storedConsent) {
+      setTimeout(function() {
+        if (banner) banner.classList.add('show');
+      }, 500);
+    } else if (storedConsent === 'all' && gaId) {
+      loadGoogleAnalytics(gaId);
+    }
+
+    // Mobile Navigation Toggle
+    var navToggle = document.getElementById('mobile-nav-toggle');
+    var nav = document.getElementById('main-nav');
+    if (navToggle && nav) {
+      navToggle.addEventListener('click', function() {
+        nav.classList.toggle('active');
+      });
+    }
+  })();
+</script>

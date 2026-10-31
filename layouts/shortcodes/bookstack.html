@@ -1,0 +1,55 @@
+{{/*
+  BookStack Shortcode for Hugo
+  Usage: 
+    {{< bookstack id="12" >}}
+    oder mit Fallback:
+    {{< bookstack id="12" >}}Standardtext falls offline{{< /bookstack >}}
+*/}}
+
+{{- $id := .Get "id" -}}
+{{- $wikiBase := .Get "url" | default site.Params.bookstack_url | strings.TrimRight "/" -}}
+{{- $bsId := os.Getenv "BS_ID" -}}
+{{- $bsSecret := os.Getenv "BS_SECRET" -}}
+{{- $endpoint := printf "%s/api/pages/%v/export/markdown" $wikiBase $id -}}
+
+{{- if and $bsId $bsSecret -}}
+  {{- $headers := dict "Authorization" (printf "Token %s:%s" $bsId $bsSecret) -}}
+  {{- $opts := dict "headers" $headers -}}
+  {{- $res := resources.GetRemote $endpoint $opts -}}
+  
+  {{- if and $res (not $res.Err) -}}
+    <div class="bookstack-content" data-bookstack-id="{{ $id }}">
+      {{ $res.Content | markdownify }}
+    </div>
+  {{- else -}}
+    <div class="bookstack-box bookstack-warning">
+      <div class="bookstack-header">
+        <span class="badge">BookStack Wiki Sync</span>
+        <span class="meta">Seite #{{ $id }}</span>
+      </div>
+      <div class="bookstack-body">
+        {{- if .Inner -}}
+          {{ .Inner | markdownify }}
+        {{- else -}}
+          <p>⚠️ <em>Inhalt konnte vorübergehend nicht aus dem Wiki geladen werden. Bitte versuche es später erneut oder besuche das <a href="{{ $wikiBase }}" target="_blank" rel="noopener">BG BiBA Wiki</a> direkt.</em></p>
+        {{- end -}}
+      </div>
+    </div>
+  {{- end -}}
+{{- else -}}
+  {{/* Fallback für lokalen Entwicklungsmodus ohne Secrets */}}
+  <div class="bookstack-box bookstack-dev-preview">
+    <div class="bookstack-header">
+      <span class="badge">BookStack Live-Content (ID: {{ $id }})</span>
+      <a href="{{ $wikiBase }}" target="_blank" rel="noopener" class="wiki-link">wiki.bgbiba.de ↗</a>
+    </div>
+    <div class="bookstack-body">
+      {{- if .Inner -}}
+        {{ .Inner | markdownify }}
+      {{- else -}}
+        <p><em>Dieser Bereich wird im GitHub Actions Build dynamisch aus BookStack exportiert und gerendert.</em></p>
+        <p class="small-text text-muted">API-Endpunkt: <code>{{ $endpoint }}</code></p>
+      {{- end -}}
+    </div>
+  </div>
+{{- end -}}

@@ -1,0 +1,36 @@
+{{ define "main" }}
+<div class="container section">
+  <header class="section-header" style="margin-bottom: 2.5rem;">
+    <div>
+      <h1 class="section-title">{{ .Title }}</h1>
+      {{ with .Description }}
+        <p class="section-subtitle">{{ . }}</p>
+      {{ end }}
+    </div>
+  </header>
+
+  {{ with .Content }}
+    <div class="section-intro" style="margin-bottom: 2.5rem; font-size: 1.1rem; line-height: 1.7; max-width: 800px;">
+      {{ . }}
+    </div>
+  {{ end }}
+
+  <div class="cards-grid">
+    {{ range .Pages }}
+      <div class="card team-card">
+        {{ with .Params.category }}
+          <span class="team-card-badge">{{ . }}</span>
+        {{ end }}
+        <div class="card-icon">{{ with .Params.icon }}{{ . }}{{ else }}🏀{{ end }}</div>
+        <h3 class="card-title">{{ .Title }}</h3>
+        <p class="card-text">
+          {{ with .Description }}{{ . }}{{ else }}{{ .Summary | truncate 120 }}{{ end }}
+        </p>
+        <div class="card-footer">
+          <a href="{{ .RelPermalink }}" class="btn btn-outline" style="width: 100%;">Zur Seite &rarr;</a>
+        </div>
+      </div>
+    {{ end }}
+  </div>
+</div>
+{{ end }}

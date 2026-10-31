@@ -1,0 +1,80 @@
+baseURL = 'https://bgbiba.de/'
+languageCode = 'de-de'
+defaultContentLanguage = 'de'
+title = 'BG BiBA – Basketballgemeinschaft Bierden-Bassen-Achim'
+
+# Hugo Security Configuration
+# Erlaubt Zugriff auf GitHub Secrets / Environment Variables und externe APIs
+[security]
+  enableInlineShortcodes = false
+  [security.funcs]
+    getenv = ['^BS_', '^SLAPI_', '^TEAMSL_', '^GA_']
+  [security.http]
+    methods = ['(?i)GET']
+    urls = ['.*']
+
+
+
+[params]
+  description = 'Offizielle Website der BG BiBA – Basketballgemeinschaft Bierden-Bassen-Achim (TSV Bierden, TSV Bassen, TSV Achim). News, Teams, Spielpläne, Tabellen und Vereinsleben.'
+  club_name = 'BG Bierden-Bassen-Achim'
+  short_name = 'BG BiBA'
+  logo = '/images/bgbiba_full_small.png'
+  logo_dark = '/images/bgbiba_full_black_white.png'
+  logo_tiny = '/images/bgbiba_full_tiny.png'
+  
+  # Externe URLs & Services
+  bookstack_url = 'https://wiki.bgbiba.de'
+  slapi_url = 'https://slapi.up.railway.app'
+  verband_id = 7
+  
+  # Social Media & Externe Links
+  instagram = 'https://www.instagram.com/bgbiba/'
+  facebook = 'https://www.facebook.com/bgbiba'
+  whatsapp = 'https://whatsapp.com/channel/0029VaDSq8rG8l5D0u7auG3C'
+  fanshop = 'https://bgbiba.fan12.de/'
+  wiki = 'https://wiki.bgbiba.de/'
+  foerderverein = 'https://www.bgbiba.info/bballer4life/'
+
+  # Stammvereine
+  stammvereine = [
+    { name = 'TSV Bierden', url = 'https://tsv-bierden.de' },
+    { name = 'TSV Bassen', url = 'https://tsv-bassen.de' },
+    { name = 'TSV Achim', url = 'https://tsv-achim.de' }
+  ]
+
+# Navigation
+[[menu.main]]
+  name = 'Startseite'
+  url = '/'
+  weight = 10
+
+[[menu.main]]
+  name = 'Teams'
+  url = '/teams/'
+  weight = 20
+
+[[menu.main]]
+  name = 'Spielbetrieb'
+  url = '/spielbetrieb/'
+  weight = 30
+
+[[menu.main]]
+  name = 'Verein'
+  url = '/verein/'
+  weight = 40
+
+[[menu.main]]
+  name = 'Hallen'
+  url = '/hallen/'
+  weight = 50
+
+[[menu.main]]
+  name = 'Wiki'
+  url = 'https://wiki.bgbiba.de/'
+  weight = 60
+
+[[menu.main]]
+  name = 'Fanshop ↗'
+  url = 'https://bgbiba.fan12.de/'
+  weight = 70
