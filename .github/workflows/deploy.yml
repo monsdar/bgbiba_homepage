@@ -23,6 +23,7 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: github-pages
     env:
       HUGO_VERSION: '0.134.1'
     steps:
@@ -62,7 +63,7 @@ jobs:
             echo "ACTIVE_IG_TOKEN=$NEW_TOKEN" >> $GITHUB_ENV
             if [ -n "${{ secrets.SECRETS_PAT }}" ]; then
               echo "Aktualisiere INSTAGRAM_TOKEN Secret im Repository..."
-              gh secret set INSTAGRAM_TOKEN --body "$NEW_TOKEN" --repo "${{ github.repository }}" || echo "Konnte Secret nicht aktualisieren (evtl. unzureichende PAT-Berechtigung)."
+              gh secret set INSTAGRAM_TOKEN --body "$NEW_TOKEN" --env github-pages --repo "${{ github.repository }}" || gh secret set INSTAGRAM_TOKEN --body "$NEW_TOKEN" --repo "${{ github.repository }}" || echo "Konnte Secret nicht aktualisieren (evtl. unzureichende PAT-Berechtigung)."
             fi
           else
             echo "Token ist noch frisch (<24h alt) oder ein Page-Token. Bestehender Token wird weiterverwendet."
