@@ -1,0 +1,18 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Hugo Server (mit .env)",
+      "type": "node",
+      "request": "launch",
+      "runtimeExecutable": "node",
+      "runtimeArgs": [
+        "-e",
+        "const p = require('child_process').spawn('hugo', ['server', '--buildDrafts'], { stdio: 'inherit', shell: true }); p.on('exit', (code) => process.exit(code || 0));"
+      ],
+      "envFile": "${workspaceFolder}/.env",
+      "console": "integratedTerminal",
+      "internalConsoleOptions": "neverOpen"
+    }
+  ]
+}

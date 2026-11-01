@@ -5,8 +5,8 @@ on:
     branches:
       - main
   schedule:
-    # Jeden Montag und Donnerstag um 06:00 UTC (Frische Spielberichte & Spieltags-Vorschauen)
-    - cron: '0 6 * * 1,4'
+    # Alle 6 Stunden (00:00, 06:00, 12:00, 18:00 UTC) frische Daten & Instagram News synchronisieren
+    - cron: '0 */6 * * *'
   workflow_dispatch:
 
 # Erforderliche Berechtigungen für GitHub Pages Deployment
@@ -41,13 +41,42 @@ jobs:
         id: pages
         uses: actions/configure-pages@v5
 
+      - name: Refresh Instagram Token
+        id: refresh_ig
+        env:
+          IG_TOKEN: ${{ secrets.INSTAGRAM_TOKEN }}
+          GH_TOKEN: ${{ secrets.SECRETS_PAT || secrets.GITHUB_TOKEN }}
+        run: |
+          if [ -z "$IG_TOKEN" ]; then
+            echo "Kein INSTAGRAM_TOKEN hinterlegt - überspringe Token-Refresh."
+            echo "ACTIVE_IG_TOKEN=" >> $GITHUB_ENV
+            exit 0
+          fi
+
+          echo "Prüfe Instagram Token-Status..."
+          REFRESH_RESPONSE=$(curl -s "https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${IG_TOKEN}")
+          NEW_TOKEN=$(echo "$REFRESH_RESPONSE" | jq -r '.access_token // empty')
+
+          if [ -n "$NEW_TOKEN" ] && [ "$NEW_TOKEN" != "null" ]; then
+            echo "Instagram Token erfolgreich erneuert!"
+            echo "ACTIVE_IG_TOKEN=$NEW_TOKEN" >> $GITHUB_ENV
+            if [ -n "${{ secrets.SECRETS_PAT }}" ]; then
+              echo "Aktualisiere INSTAGRAM_TOKEN Secret im Repository..."
+              gh secret set INSTAGRAM_TOKEN --body "$NEW_TOKEN" --repo "${{ github.repository }}" || echo "Konnte Secret nicht aktualisieren (evtl. unzureichende PAT-Berechtigung)."
+            fi
+          else
+            echo "Token ist noch frisch (<24h alt) oder ein Page-Token. Bestehender Token wird weiterverwendet."
+            echo "ACTIVE_IG_TOKEN=$IG_TOKEN" >> $GITHUB_ENV
+          fi
+
       - name: Build with Hugo
         env:
-          # Externe Secrets für BookStack, TeamSL API und Analytics
+          # Externe Secrets für BookStack, TeamSL API, Instagram und Analytics
           BS_ID: ${{ secrets.BS_ID }}
           BS_SECRET: ${{ secrets.BS_SECRET }}
           SLAPI_TOKEN: ${{ secrets.SLAPI_TOKEN }}
           GA_MEASUREMENT_ID: ${{ secrets.GA_MEASUREMENT_ID }}
+          INSTAGRAM_TOKEN: ${{ env.ACTIVE_IG_TOKEN || secrets.INSTAGRAM_TOKEN }}
         run: |
           hugo \
             --minify \

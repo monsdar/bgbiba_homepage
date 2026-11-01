@@ -81,20 +81,7 @@ Dieses Dokument beschreibt die Architektur, Designentscheidungen und technischen
 
 ---
 
-### 2.3 CSV-Spielplan (`layouts/partials/matches.html`)
-* **Ziel:** Einfache Einbindung von Turnier- oder Offline-Spielplänen.
-* **Format:** Komma- oder Semikolon-getrennte CSV mit den Spalten `Datum, Uhrzeit, Heim, Gast, Spielstaette, Ergebnis`.
-* **Parsing:**
-  ```go
-  {{ $rows := $csvData | transform.Unmarshal (dict "delimiter" ",") }}
-  {{ $header := index $rows 0 }}
-  {{ $dataRows := after 1 $rows }}
-  ```
-* **Fallback:** Rückgriff auf `assets/data/sample-matches.csv`.
-
----
-
-### 2.4 Cookie-Banner & Google Analytics (`layouts/partials/cookie-banner.html`)
+### 2.3 Cookie-Banner & Google Analytics (`layouts/partials/cookie-banner.html`)
 * **DSGVO-Prinzip:** Kein Tracking-Skript vor ausdrücklicher Einwilligung (*Opt-In*).
 * **Funktionsweise:**
   1. Beim Seitenaufruf wird `localStorage.getItem('bgbiba_cookie_consent')` geprüft.
@@ -113,7 +100,7 @@ Dieses Dokument beschreibt die Architektur, Designentscheidungen und technischen
 
 ---
 
-### 2.5 Asset-Pipeline (Hugo Pipes)
+### 2.4 Asset-Pipeline (Hugo Pipes)
 In `layouts/_default/baseof.html` werden die Stylesheets verarbeitet:
 ```go
 {{- $css := resources.Get "css/main.css" | minify | fingerprint -}}
@@ -124,13 +111,31 @@ In `layouts/_default/baseof.html` werden die Stylesheets verarbeitet:
 
 ---
 
+### 2.5 Instagram News Feed Integration (`layouts/partials/instagram-news.html`)
+* **Ziel:** Die neuesten Beiträge und Reels aus dem Instagram-Kanal [@bgbiba](https://www.instagram.com/bgbiba/) werden als aktuelle Vereins-News auf der Startseite dargestellt.
+* **100 % DSGVO-Konformität:**
+  * Der Abruf erfolgt zur Build-Zeit via `resources.GetRemote` über die offizielle Meta Graph API:
+    `https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=6&access_token=<INSTAGRAM_TOKEN>`
+  * Webseiten-Besucher haben keinen direkten Kontakt zu Meta-Servern (keine Cookies, kein Tracking).
+* **Interaktives Lightbox-Modal:**
+  * Klick auf eine News-Card öffnet ein barrierefreies HTML5 `<dialog>` Element mit Vollbild/Video-Player, vollständigem Text und direktem Link: *„Auf Instagram ansehen & kommentieren ↗“*.
+  * Konform mit den `modern-web-guidance`-Best-Practices (Escape-Schließen, Light-Dismiss Backdrop-Click, Video-Pause bei Close).
+* **Fallback-Mechanismus:**
+  * Fehlt `INSTAGRAM_TOKEN` oder ist Meta offline, lädt Hugo automatisch [assets/data/sample-instagram.json](file:///e:/Projects/Biba_Homepage/assets/data/sample-instagram.json).
+
+---
+
 ## 3. CI/CD Deployment Workflow (`.github/workflows/deploy.yml`)
 
-Der Workflow ist für GitHub Pages optimiert:
+Der Workflow ist für GitHub Pages und dynamische Content-Quellen optimiert:
 * **Trigger:**
   * Push auf `main`
-  * Cron: `0 6 * * 1,4` (Mo & Do 06:00 UTC)
+  * Cron: `0 */6 * * *` (Alle 6 Stunden: 00:00, 06:00, 12:00, 18:00 UTC)
   * Manueller Trigger: `workflow_dispatch`
+* **Vorgelagerter Step: Instagram Token-Refresh:**
+  * Vor dem Hugo-Build prüft die Action den Status des Tokens bei Metas offiziellem Refresh-Endpunkt:
+    `GET https://graph.instagram.com/refresh_access_token?grant_type=ig_refresh_token&access_token=${IG_TOKEN}`
+  * Gibt Meta einen erneuerten Token zurück, wird dieser direkt für den Build bereitgestellt und optional via `gh secret set INSTAGRAM_TOKEN` im Repository aktualisiert (falls ein PAT mit `secrets:write` als `SECRETS_PAT` hinterlegt ist).
 * **Umgebungsvariablen im Build-Schritt:**
   ```yaml
   env:
@@ -138,7 +143,9 @@ Der Workflow ist für GitHub Pages optimiert:
     BS_SECRET: ${{ secrets.BS_SECRET }}
     SLAPI_TOKEN: ${{ secrets.SLAPI_TOKEN }}
     GA_MEASUREMENT_ID: ${{ secrets.GA_MEASUREMENT_ID }}
+    INSTAGRAM_TOKEN: ${{ env.ACTIVE_IG_TOKEN || secrets.INSTAGRAM_TOKEN }}
   run: |
     hugo --minify --baseURL "${{ steps.pages.outputs.base_url }}/"
   ```
 * **Deployment:** Nutzung der offiziellen Aktionen `actions/upload-pages-artifact@v3` und `actions/deploy-pages@v4`.
+

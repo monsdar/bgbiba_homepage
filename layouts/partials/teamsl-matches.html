@@ -4,6 +4,7 @@
 */}}
 
 {{- $leagueId := .league_id -}}
+{{- $teamId := .team_id -}}
 {{- $limit := .limit | default 10 | int -}}
 {{- $onlyBiba := .only_biba | default false -}}
 {{- $apiBase := site.Params.slapi_url | default "https://slapi.up.railway.app" | strings.TrimRight "/" -}}
@@ -12,10 +13,15 @@
 {{- $matches := slice -}}
 {{- $isLive := false -}}
 
-{{- if and $token $leagueId -}}
+{{- $isRealLeague := false -}}
+{{- if and $leagueId (findRE "^[0-9]+$" (printf "%v" $leagueId)) -}}
+  {{- $isRealLeague = gt (int $leagueId) 999 -}}
+{{- end -}}
+{{- if and $token $leagueId $isRealLeague -}}
   {{- $endpoint := printf "%s/leagues/%v/matches" $apiBase $leagueId -}}
   {{- $headers := dict "Authorization" (printf "Bearer %s" $token) -}}
-  {{- $res := resources.GetRemote $endpoint (dict "headers" $headers) -}}
+  {{- $opts := dict "headers" $headers -}}
+  {{- $res := resources.GetRemote $endpoint $opts -}}
   {{- if and $res (not $res.Err) -}}
     {{- $json := $res | transform.Unmarshal -}}
     {{- with $json.matches -}}
@@ -36,6 +42,11 @@
   {{- end -}}
 {{- end -}}
 
+{{- $teamIdStr := "" -}}
+{{- with $teamId -}}
+  {{- $teamIdStr = trim (printf "%v" .) " " -}}
+{{- end -}}
+
 <div class="teamsl-matches-wrapper">
   <div class="matches-header">
     <div class="header-titles">
@@ -53,11 +64,35 @@
     {{- range $matches -}}
       {{- $home := .home_team.name -}}
       {{- $away := .away_team.name -}}
-      {{- $isBibaHome := in (lower $home) "biba" -}}
-      {{- $isBibaAway := in (lower $away) "biba" -}}
-      
+      {{- $homeClubId := printf "%v" (or .home_team.club_id "") -}}
+      {{- $awayClubId := printf "%v" (or .away_team.club_id "") -}}
+      {{- $isBibaHome := or (in (lower $home) "biba") (in (lower $home) "bierden") (eq $homeClubId "4189") -}}
+      {{- $isBibaAway := or (in (lower $away) "biba") (in (lower $away) "bierden") (eq $awayClubId "4189") -}}
+
+      {{- $isTargetHome := false -}}
+      {{- $isTargetAway := false -}}
+      {{- if $teamIdStr -}}
+        {{- $homeId := printf "%v" (or .home_team.id "") -}}
+        {{- $homeSeasonId := printf "%v" (or .home_team.season_team_id "") -}}
+        {{- $homePermId := printf "%v" (or .home_team.team_permanent_id "") -}}
+        {{- if or (eq $homeId $teamIdStr) (eq $homeSeasonId $teamIdStr) (eq $homePermId $teamIdStr) -}}
+          {{- $isTargetHome = true -}}
+        {{- end -}}
+
+        {{- $awayId := printf "%v" (or .away_team.id "") -}}
+        {{- $awaySeasonId := printf "%v" (or .away_team.season_team_id "") -}}
+        {{- $awayPermId := printf "%v" (or .away_team.team_permanent_id "") -}}
+        {{- if or (eq $awayId $teamIdStr) (eq $awaySeasonId $teamIdStr) (eq $awayPermId $teamIdStr) -}}
+          {{- $isTargetAway = true -}}
+        {{- end -}}
+      {{- end -}}
+
       {{- $include := true -}}
-      {{- if $onlyBiba -}}
+      {{- if $teamIdStr -}}
+        {{- if not (or $isTargetHome $isTargetAway) -}}
+          {{- $include = false -}}
+        {{- end -}}
+      {{- else if $onlyBiba -}}
         {{- if not (or $isBibaHome $isBibaAway) -}}
           {{- $include = false -}}
         {{- end -}}
@@ -71,7 +106,15 @@
         {{- $dateStr := $dt.Format "02.01.2006" -}}
         {{- $timeStr := $dt.Format "15:04" -}}
 
-        <div class="match-card {{ if or $isBibaHome $isBibaAway }}match-biba{{ end }}">
+        {{- $cardIsBiba := or $isBibaHome $isBibaAway -}}
+        {{- $highlightHome := $isBibaHome -}}
+        {{- $highlightAway := $isBibaAway -}}
+        {{- if $teamIdStr -}}
+          {{- $highlightHome = $isTargetHome -}}
+          {{- $highlightAway = $isTargetAway -}}
+        {{- end -}}
+
+        <div class="match-card {{ if $cardIsBiba }}match-biba{{ end }}">
           <div class="match-meta">
             <span class="match-date">{{ $dateStr }}</span>
             <span class="match-time">{{ $timeStr }} Uhr</span>
@@ -81,7 +124,7 @@
           </div>
 
           <div class="match-teams-box">
-            <div class="team team-home {{ if $isBibaHome }}is-biba{{ end }}">
+            <div class="team team-home {{ if $highlightHome }}is-biba{{ end }}">
               <span class="team-name">{{ $home }}</span>
               {{- if .is_finished -}}
                 <span class="team-score">{{ .score_home }}</span>
@@ -98,7 +141,7 @@
               {{- end -}}
             </div>
 
-            <div class="team team-away {{ if $isBibaAway }}is-biba{{ end }}">
+            <div class="team team-away {{ if $highlightAway }}is-biba{{ end }}">
               <span class="team-name">{{ $away }}</span>
               {{- if .is_finished -}}
                 <span class="team-score">{{ .score_away }}</span>

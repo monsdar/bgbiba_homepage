@@ -10,10 +10,15 @@
 {{- $standings := slice -}}
 {{- $isLive := false -}}
 
-{{- if and $token $leagueId -}}
+{{- $isRealLeague := false -}}
+{{- if and $leagueId (findRE "^[0-9]+$" (printf "%v" $leagueId)) -}}
+  {{- $isRealLeague = gt (int $leagueId) 999 -}}
+{{- end -}}
+{{- if and $token $leagueId $isRealLeague -}}
   {{- $endpoint := printf "%s/leagues/%v/standings" $apiBase $leagueId -}}
   {{- $headers := dict "Authorization" (printf "Bearer %s" $token) -}}
-  {{- $res := resources.GetRemote $endpoint (dict "headers" $headers) -}}
+  {{- $opts := dict "headers" $headers -}}
+  {{- $res := resources.GetRemote $endpoint $opts -}}
   {{- if and $res (not $res.Err) -}}
     {{- $json := $res | transform.Unmarshal -}}
     {{- with $json.standings -}}
@@ -63,7 +68,8 @@
       <tbody>
         {{- range $standings -}}
           {{- $teamName := .team.name -}}
-          {{- $isBiba := in (lower $teamName) "biba" -}}
+          {{- $clubId := printf "%v" (or .team.club_id "") -}}
+          {{- $isBiba := or (in (lower $teamName) "biba") (in (lower $teamName) "bierden") (eq $clubId "4189") -}}
           {{- $games := add .wins .losses -}}
           <tr class="{{ if $isBiba }}highlight-biba{{ end }}">
             <td class="col-pos font-bold">{{ .position }}</td>

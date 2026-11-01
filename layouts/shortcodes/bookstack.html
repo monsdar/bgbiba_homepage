@@ -10,16 +10,23 @@
 {{- $wikiBase := .Get "url" | default site.Params.bookstack_url | strings.TrimRight "/" -}}
 {{- $bsId := os.Getenv "BS_ID" -}}
 {{- $bsSecret := os.Getenv "BS_SECRET" -}}
-{{- $endpoint := printf "%s/api/pages/%v/export/markdown" $wikiBase $id -}}
+{{- $endpoint := printf "%s/api/pages/%v" $wikiBase $id -}}
 
 {{- if and $bsId $bsSecret -}}
-  {{- $headers := dict "Authorization" (printf "Token %s:%s" $bsId $bsSecret) -}}
+  {{- $headers := dict "Authorization" (printf "Token %s:%s" $bsId $bsSecret) "Accept" "application/json" -}}
   {{- $opts := dict "headers" $headers -}}
   {{- $res := resources.GetRemote $endpoint $opts -}}
   
   {{- if and $res (not $res.Err) -}}
+    {{- $data := $res | transform.Unmarshal -}}
     <div class="bookstack-content" data-bookstack-id="{{ $id }}">
-      {{ $res.Content | markdownify }}
+      {{- if $data.html -}}
+        {{ $data.html | safeHTML }}
+      {{- else if $data.markdown -}}
+        {{ $data.markdown | markdownify }}
+      {{- else if .Inner -}}
+        {{ .Inner | markdownify }}
+      {{- end -}}
     </div>
   {{- else -}}
     <div class="bookstack-box bookstack-warning">

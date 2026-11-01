@@ -17,8 +17,10 @@ Die Website basiert auf **Hugo (Extended)** und ist für ein schnelles, sicheres
   * Direkte Anbindung an den TeamSL API-Server (`https://slapi.up.railway.app/`).
   * Holt Ligaspiele, Spielstände, Hallenorte und Tabellenstände der Mannschaften live zur Build-Zeit.
   * Spezielle Hervorhebung von BG BiBA Teams.
-* **Universeller CSV-Spielplan (`{{< matches >}}`):**
-  * Ermöglicht die Einbindung von Spielplänen für Turniere, Freundschaftsspiele oder Sonder-Events per CSV-Datei (Remote oder lokal) via `transform.Unmarshal`.
+* **Instagram News Feed Integration (`layouts/partials/instagram-news.html`):**
+  * Stellt die aktuellen Instagram-Posts und -Reels des Kanals [@bgbiba](https://www.instagram.com/bgbiba/) als Vereins-News auf der Startseite dar.
+  * 100 % DSGVO-konform: Bilder und Texte werden beim Build statisch gerendert – kein fremdes Skript und keine Meta-Cookies für Besucher.
+  * Interaktives, barrierefreies Lightbox-Modal zum Lesen des vollständigen Beitrags und direktem Link zu Instagram.
 * **DSGVO & Datenschutzkonformität:**
   * Modernes Cookie-Banner mit Opt-In: Google Analytics 4 (GA4) wird erst nach ausdrücklicher Einwilligung des Nutzers geladen.
   * Einwilligungen werden lokal gespeichert und können jederzeit über die Datenschutzerklärung bzw. den Footer geändert oder widerrufen werden.
@@ -28,7 +30,8 @@ Die Website basiert auf **Hugo (Extended)** und ist für ein schnelles, sicheres
   * Gestochen scharfe Vektor- und Bildlogos, mobilfreundliche Navigation und Card-Grids für Teams, News und Spiele.
 * **Vollautomatisiertes GitHub Actions CI/CD:**
   * Automatisches Deployment bei Push auf `main`.
-  * **Cron-Job (2x wöchentlich):** Baut die Seite automatisch jeden Montag und Donnerstag um 06:00 UTC neu, um frische Wochenend-Spielergebnisse und Vorschauen zu veröffentlichen.
+  * **Cron-Job (alle 6 Stunden):** Synchronisiert die Seite 4x täglich (00:00, 06:00, 12:00, 18:00 UTC) mit frischen Instagram-Beiträgen, TeamSL-Spielständen und BookStack-Inhalten.
+  * **Automatisierter Token-Refresh:** Verlängert den Instagram API-Token vorgelagert vor dem Build.
   * Manueller Build per GitHub-Button (`workflow_dispatch`).
 
 ---
@@ -41,7 +44,7 @@ Die Website basiert auf **Hugo (Extended)** und ist für ein schnelles, sicheres
 ├── assets/
 │   ├── css/
 │   │   └── main.css        # Zentrales Design-System & Tokens (Hugo Pipes)
-│   ├── data/               # Lokale Mock-/Fallback-Daten (JSON & CSV)
+│   ├── data/               # Lokale Mock-/Fallback-Daten (JSON)
 │   └── images/             # Logos für Asset-Pipeline
 ├── content/
 │   ├── teams/              # Team-Seiten (U10 bis Senioren & Daddeltruppe)
@@ -53,8 +56,8 @@ Die Website basiert auf **Hugo (Extended)** und ist für ein schnelles, sicheres
 │   └── verein.md           # Über die BG BiBA & Stammvereine
 ├── layouts/
 │   ├── _default/           # Baseof, Single und List Templates
-│   ├── partials/           # Header, Footer, Cookie-Banner, Matches, Standings
-│   ├── shortcodes/         # BookStack, TeamSL und CSV Shortcodes
+│   ├── partials/           # Header, Footer, Cookie-Banner, TeamSL Matches & Standings
+│   ├── shortcodes/         # BookStack und TeamSL Shortcodes
 │   └── index.html          # Startseiten-Layout
 ├── static/                 # Statische Dateien (Logos, Icons, etc.)
 ├── .env.example            # Vorlage für lokale Umgebungsvariablen
@@ -94,9 +97,16 @@ GA_MEASUREMENT_ID=G-XXXXXXXXXX
 > **Hinweis:** Die `.env` Datei wird durch `.gitignore` geschützt und niemals in Git übertragen. Fehlen die Variablen lokal, nutzt Hugo automatisch sichere Fallbacks (Mock-Daten und Vorschau-Texte), sodass der lokale Server jederzeit lauffähig bleibt.
 
 ### 3. Entwicklungsserver starten
-```bash
-hugo server
-```
+
+* **In Antigravity IDE / VS Code (Empfohlen):**
+  Drücke einfach **`F5`** (oder wähle in *Run & Debug* den Eintrag **Hugo Server (mit .env)**). Die `.env`-Datei wird dabei automatisch geladen.
+  Alternativ kannst du auch den Build-Shortcut **`Ctrl + Shift + B`** drücken.
+
+* **Manuell im Terminal (PowerShell):**
+  ```powershell
+  Get-Content .env | Where-Object { $_ -match '=' -and -not $_.StartsWith('#') } | ForEach-Object { $k,$v = $_.Split('=',2); Set-Item -Path "env:$($k.Trim())" -Value $v.Trim() }; hugo server
+  ```
+
 Die Website ist nun unter **`http://localhost:1313/`** mit automatischem Live-Reload erreichbar.
 
 ---
@@ -133,14 +143,12 @@ Hier steht der Text, falls BookStack offline ist.
 ```markdown
 {{< teamsl-matches league_id="12001" limit="5" only_biba="true" >}}
 ```
+Optional mit `team_id`, falls mehrere eigene Teams in derselben Liga spielen:
+```markdown
+{{< teamsl-matches league_id="54185" team_id="457177" limit="5" >}}
+```
 
 ### 3. TeamSL Tabelle anzeigen
 ```markdown
 {{< teamsl-standings league_id="12001" >}}
 ```
-
-### 4. CSV-Spielplan anzeigen
-```markdown
-{{< matches url="https://example.com/plan.csv" limit="10" >}}
-```
-*(Wird keine URL angegeben, wird der lokale Beispieldaten-Spielplan gerendert).*

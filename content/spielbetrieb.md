@@ -18,11 +18,3 @@ Die Spiele und Tabellen werden direkt über unsere TeamSL-Schnittstelle bezogen:
 ### Aktuelle Ligatabelle
 
 {{< teamsl-standings >}}
-
----
-
-## Turniere & Sonderansetzungen (CSV-Schnittstelle)
-
-Für Freundschaftsspiele, vereinsinterne Turniere oder Verbandsevents können Spielpläne direkt per CSV eingebunden werden:
-
-{{< matches limit="10" >}}

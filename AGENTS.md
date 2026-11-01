@@ -29,7 +29,7 @@ Willkommen in der Codebase der **BG BiBA Homepage**! Dieses Dokument enthält ve
 * Dokumentiere neue Variablen in `.env.example`.
 
 ### 🔴 2. Keine Pre-Build-Skripte
-* Externe Datenquellen (Wiki, APIs, CSVs) **müssen** zur Build-Zeit nativ über Hugos `resources.GetRemote` abgefragt werden.
+* Externe Datenquellen (Wiki, APIs) **müssen** zur Build-Zeit nativ über Hugos `resources.GetRemote` abgefragt werden.
 * Führe **keine** separaten Python-, Node- oder Shell-Skripte ein, die vor `hugo` ausgeführt werden müssen.
 
 ### 🔴 3. Ausfallsicherheit & Lokale Fallbacks
@@ -38,7 +38,7 @@ Willkommen in der Codebase der **BG BiBA Homepage**! Dieses Dokument enthält ve
 * Für alle externen Schnittstellen existieren Fallback-Dateien in `assets/data/`:
   * `sample-matches.json` (TeamSL Spiele)
   * `sample-standings.json` (TeamSL Tabelle)
-  * `sample-matches.csv` (CSV Spielplan)
+  * `sample-instagram.json` (Instagram News Feed)
 * Bei BookStack: Render im Dev-Modus eine Vorschau-Box oder den inneren Fallback-Text.
 
 ### 🔴 4. Keine ungefragten CSS-Frameworks
@@ -60,7 +60,7 @@ Willkommen in der Codebase der **BG BiBA Homepage**! Dieses Dokument enthält ve
 | **Neuer Shortcode** | `layouts/shortcodes/<name>.html` | Ermöglicht Aufruf im Markdown via `{{< name ... >}}`. |
 | **Neues Partial / Widget** | `layouts/partials/<name>.html` | Einbindung via `{{ partial "<name>.html" . }}`. |
 | **Styles & Design-Tokens** | `assets/css/main.css` | Variablen unter `:root` erweitern. |
-| **Mock- / Fallback-Daten** | `assets/data/` | JSON- oder CSV-Dateien für Offline-Betrieb. |
+| **Mock- / Fallback-Daten** | `assets/data/` | JSON-Dateien für Offline-Betrieb. |
 | **Statische Bilder & Logos** | `static/images/` und `assets/images/` | Für direkten URL-Zugriff (`/images/...`) und Hugo Pipes. |
 | **Globale Einstellungen** | `hugo.toml` | Menüs, Security-Whitelists und Vereins-Params. |
 | **Deployment-Anpassungen** | `.github/workflows/deploy.yml` | Cron-Schedules und Environment-Secrets. |

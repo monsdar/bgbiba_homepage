@@ -2,13 +2,14 @@ baseURL = 'https://bgbiba.de/'
 languageCode = 'de-de'
 defaultContentLanguage = 'de'
 title = 'BG BiBA – Basketballgemeinschaft Bierden-Bassen-Achim'
+timeout = '60s'
 
 # Hugo Security Configuration
 # Erlaubt Zugriff auf GitHub Secrets / Environment Variables und externe APIs
 [security]
   enableInlineShortcodes = false
   [security.funcs]
-    getenv = ['^BS_', '^SLAPI_', '^TEAMSL_', '^GA_']
+    getenv = ['^BS_', '^SLAPI_', '^TEAMSL_', '^GA_', '^INSTAGRAM_', '^IG_']
   [security.http]
     methods = ['(?i)GET']
     urls = ['.*']

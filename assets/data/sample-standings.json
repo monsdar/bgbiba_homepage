@@ -3,7 +3,7 @@
   "standings": [
     {
       "position": 1,
-      "team": { "name": "BG BiBA" },
+      "team": { "id": "457177", "name": "BG BiBA 1", "club_id": 4189 },
       "wins": 4,
       "losses": 0,
       "points_for": 312,
