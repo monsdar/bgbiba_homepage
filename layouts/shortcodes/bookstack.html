@@ -29,34 +29,61 @@
       {{- end -}}
     </div>
   {{- else -}}
-    <div class="bookstack-box bookstack-warning">
-      <div class="bookstack-header">
-        <span class="badge">BookStack Wiki Sync</span>
-        <span class="meta">Seite #{{ $id }}</span>
+    {{/* API-Request fehlgeschlagen */}}
+    <div class="api-fallback-box api-fallback-warning bookstack-fallback-box">
+      <div class="api-fallback-header">
+        <span class="badge badge-error">⚠️ BookStack Sync fehlgeschlagen</span>
+        <span class="api-fallback-meta">Seite #{{ $id }}</span>
       </div>
-      <div class="bookstack-body">
+      <div class="api-fallback-content">
+        <h3 class="api-fallback-title">Wiki-Inhalt konnte nicht geladen werden</h3>
+        <p class="api-fallback-desc">
+          Beim Abruf von Seite #{{ $id }} von <code>{{ $wikiBase }}</code> trat ein Fehler auf. Bitte prüfe, ob die Seite existiert und das Token Leserechte besitzt.
+        </p>
         {{- if .Inner -}}
-          {{ .Inner | markdownify }}
-        {{- else -}}
-          <p>⚠️ <em>Inhalt konnte vorübergehend nicht aus dem Wiki geladen werden. Bitte versuche es später erneut oder besuche das <a href="{{ $wikiBase }}" target="_blank" rel="noopener">BG BiBA Wiki</a> direkt.</em></p>
+          <div class="bookstack-inner-fallback">
+            <strong style="display: block; font-size: 0.85rem; color: #78350f; margin-bottom: 0.5rem;">📄 Angezeigter redaktioneller Ausweichinhalt:</strong>
+            {{ .Inner | markdownify }}
+          </div>
         {{- end -}}
+        <div class="api-fallback-actions" style="margin-top: 1rem;">
+          <a href="{{ $wikiBase }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+            📖 BG BiBA Vereins-Wiki öffnen ↗
+          </a>
+        </div>
       </div>
     </div>
   {{- end -}}
 {{- else -}}
-  {{/* Fallback für lokalen Entwicklungsmodus ohne Secrets */}}
-  <div class="bookstack-box bookstack-dev-preview">
-    <div class="bookstack-header">
-      <span class="badge">BookStack Live-Content (ID: {{ $id }})</span>
-      <a href="{{ $wikiBase }}" target="_blank" rel="noopener" class="wiki-link">wiki.bgbiba.de ↗</a>
+  {{/* Keine Secrets hinterlegt */}}
+  <div class="api-fallback-box api-fallback-warning bookstack-fallback-box">
+    <div class="api-fallback-header">
+      <span class="badge badge-error">⚠️ BookStack Secrets fehlen</span>
+      <span class="api-fallback-meta">Seite #{{ $id }}</span>
     </div>
-    <div class="bookstack-body">
+    <div class="api-fallback-content">
+      <h3 class="api-fallback-title">BookStack Live-Synchronisierung nicht konfiguriert</h3>
+      <p class="api-fallback-desc">
+        Die Umgebungsvariablen <code>BS_ID</code> und <code>BS_SECRET</code> sind in der Build-Umgebung nicht hinterlegt. Ohne diese Tokens kann Hugo Seite #{{ $id }} nicht aus dem Wiki exportieren.
+      </p>
+      <div class="api-fallback-checklist">
+        <strong>So aktivierst du den Wiki-Sync:</strong>
+        <ul>
+          <li>Füge <code>BS_ID</code> und <code>BS_SECRET</code> als GitHub Repository Secrets unter <em>Settings &rarr; Secrets and variables &rarr; Actions</em> hinzu.</li>
+          <li>Für lokale Entwicklung trage die Werte in deine lokale <code>.env</code>-Datei ein.</li>
+        </ul>
+      </div>
       {{- if .Inner -}}
-        {{ .Inner | markdownify }}
-      {{- else -}}
-        <p><em>Dieser Bereich wird im GitHub Actions Build dynamisch aus BookStack exportiert und gerendert.</em></p>
-        <p class="small-text text-muted">API-Endpunkt: <code>{{ $endpoint }}</code></p>
+        <div class="bookstack-inner-fallback">
+          <strong style="display: block; font-size: 0.85rem; color: #78350f; margin-bottom: 0.5rem;">📄 Angezeigter redaktioneller Ausweichinhalt:</strong>
+          {{ .Inner | markdownify }}
+        </div>
       {{- end -}}
+      <div class="api-fallback-actions" style="margin-top: 1rem;">
+        <a href="{{ $wikiBase }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+          📖 Seite im Vereins-Wiki aufrufen ↗
+        </a>
+      </div>
     </div>
   </div>
 {{- end -}}

@@ -11,10 +11,10 @@ Hier findest du alle anstehenden und absolvierten Spiele sowie die Tabellen unse
 
 Die Spiele und Tabellen werden direkt über unsere TeamSL-Schnittstelle bezogen:
 
-### Nächste Ansetzungen
+### Nächste Ansetzungen (Beispiel: U12 Bezirksliga)
 
-{{< teamsl-matches limit="8" only_biba="false" >}}
+{{< teamsl-matches league_id="54185" limit="8" only_biba="false" >}}
 
 ### Aktuelle Ligatabelle
 
-{{< teamsl-standings >}}
+{{< teamsl-standings league_id="54185" >}}

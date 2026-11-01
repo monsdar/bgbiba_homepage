@@ -1,6 +1,6 @@
 {{/*
   TeamSL DBB Standings Component
-  Fetches live DBB league standings from TeamSL API or uses local mock data if offline/local.
+  Fetches live DBB league standings from TeamSL API or displays clear diagnostic alert if sync failed.
 */}}
 
 {{- $leagueId := .league_id -}}
@@ -9,12 +9,20 @@
 
 {{- $standings := slice -}}
 {{- $isLive := false -}}
+{{- $errorMessage := "" -}}
 
 {{- $isRealLeague := false -}}
 {{- if and $leagueId (findRE "^[0-9]+$" (printf "%v" $leagueId)) -}}
   {{- $isRealLeague = gt (int $leagueId) 999 -}}
 {{- end -}}
-{{- if and $token $leagueId $isRealLeague -}}
+
+{{- if not $token -}}
+  {{- $errorMessage = "Secret SLAPI_TOKEN fehlt in der Build-Umgebung" -}}
+{{- else if not $leagueId -}}
+  {{- $errorMessage = "Keine league_id im Shortcode angegeben" -}}
+{{- else if not $isRealLeague -}}
+  {{- $errorMessage = printf "Ungültige oder temporäre Liga-ID (%v). Eine offizielle DBB-Liga-ID muss 5-stellig sein." $leagueId -}}
+{{- else -}}
   {{- $endpoint := printf "%s/leagues/%v/standings" $apiBase $leagueId -}}
   {{- $headers := dict "Authorization" (printf "Bearer %s" $token) -}}
   {{- $opts := dict "headers" $headers -}}
@@ -24,18 +32,11 @@
     {{- with $json.standings -}}
       {{- $standings = . -}}
       {{- $isLive = true -}}
+    {{- else -}}
+      {{- $errorMessage = printf "Keine Tabelle für Liga %v in TeamSL gefunden." $leagueId -}}
     {{- end -}}
-  {{- end -}}
-{{- end -}}
-
-{{- if eq (len $standings) 0 -}}
-  {{/* Fallback to local sample standings */}}
-  {{- $fallback := resources.Get "data/sample-standings.json" -}}
-  {{- if $fallback -}}
-    {{- $json := $fallback | transform.Unmarshal -}}
-    {{- with $json.standings -}}
-      {{- $standings = . -}}
-    {{- end -}}
+  {{- else if $res.Err -}}
+    {{- $errorMessage = printf "Fehler beim API-Abruf (%s): %s" $endpoint $res.Err -}}
   {{- end -}}
 {{- end -}}
 
@@ -46,48 +47,83 @@
       {{- if $isLive -}}
         <span class="badge badge-live">● Live Sync</span>
       {{- else -}}
-        <span class="badge badge-demo">Vorschau</span>
+        <span class="badge badge-error">⚠️ Sync fehlgeschlagen</span>
       {{- end -}}
     </div>
   </div>
 
-  <div class="table-responsive">
-    <table class="standings-table">
-      <thead>
-        <tr>
-          <th class="col-pos">#</th>
-          <th class="col-team">Team</th>
-          <th class="col-stat text-center">Spiele</th>
-          <th class="col-stat text-center">S</th>
-          <th class="col-stat text-center">N</th>
-          <th class="col-stat text-center">Körbe</th>
-          <th class="col-stat text-center">Diff</th>
-          <th class="col-stat text-center font-bold">Punkte</th>
-        </tr>
-      </thead>
-      <tbody>
-        {{- range $standings -}}
-          {{- $teamName := .team.name -}}
-          {{- $clubId := printf "%v" (or .team.club_id "") -}}
-          {{- $isBiba := or (in (lower $teamName) "biba") (in (lower $teamName) "bierden") (eq $clubId "4189") -}}
-          {{- $games := add .wins .losses -}}
-          <tr class="{{ if $isBiba }}highlight-biba{{ end }}">
-            <td class="col-pos font-bold">{{ .position }}</td>
-            <td class="col-team {{ if $isBiba }}team-biba{{ end }}">
-              {{ $teamName }}
-              {{ if $isBiba }}<span class="badge badge-small-biba">BG BiBA</span>{{ end }}
-            </td>
-            <td class="col-stat text-center">{{ $games }}</td>
-            <td class="col-stat text-center stat-win">{{ .wins }}</td>
-            <td class="col-stat text-center stat-loss">{{ .losses }}</td>
-            <td class="col-stat text-center text-muted">{{ .points_for }}:{{ .points_against }}</td>
-            <td class="col-stat text-center font-mono">
-              {{- if gt .point_difference 0 }}+{{ .point_difference }}{{ else }}{{ .point_difference }}{{ end -}}
-            </td>
-            <td class="col-stat text-center font-bold font-primary">{{ .win_points }}:{{ .loss_points }}</td>
+  {{- if and $isLive (gt (len $standings) 0) -}}
+    <div class="table-responsive">
+      <table class="standings-table">
+        <thead>
+          <tr>
+            <th class="col-pos">#</th>
+            <th class="col-team">Team</th>
+            <th class="col-stat text-center">Spiele</th>
+            <th class="col-stat text-center">S</th>
+            <th class="col-stat text-center">N</th>
+            <th class="col-stat text-center">Körbe</th>
+            <th class="col-stat text-center">Diff</th>
+            <th class="col-stat text-center font-bold">Punkte</th>
           </tr>
-        {{- end -}}
-      </tbody>
-    </table>
-  </div>
+        </thead>
+        <tbody>
+          {{- range $standings -}}
+            {{- $teamName := .team.name -}}
+            {{- $clubId := printf "%v" (or .team.club_id "") -}}
+            {{- $isBiba := or (in (lower $teamName) "biba") (in (lower $teamName) "bierden") (eq $clubId "4189") -}}
+            {{- $games := add .wins .losses -}}
+            <tr class="{{ if $isBiba }}highlight-biba{{ end }}">
+              <td class="col-pos font-bold">{{ .position }}</td>
+              <td class="col-team {{ if $isBiba }}team-biba{{ end }}">
+                {{ $teamName }}
+                {{ if $isBiba }}<span class="badge badge-small-biba">BG BiBA</span>{{ end }}
+              </td>
+              <td class="col-stat text-center">{{ $games }}</td>
+              <td class="col-stat text-center stat-win">{{ .wins }}</td>
+              <td class="col-stat text-center stat-loss">{{ .losses }}</td>
+              <td class="col-stat text-center text-muted">{{ .points_for }}:{{ .points_against }}</td>
+              <td class="col-stat text-center font-mono">
+                {{- if gt .point_difference 0 }}+{{ .point_difference }}{{ else }}{{ .point_difference }}{{ end -}}
+              </td>
+              <td class="col-stat text-center font-bold font-primary">{{ .win_points }}:{{ .loss_points }}</td>
+            </tr>
+          {{- end -}}
+        </tbody>
+      </table>
+    </div>
+  {{- else -}}
+    {{/* Eindeutige Fehlermeldung statt verwirrender Dummy-Inhalte */}}
+    <div class="api-fallback-box api-fallback-warning" style="margin: 1.25rem; border: none; box-shadow: none;">
+      <div class="api-fallback-content">
+        <h3 class="api-fallback-title">Tabelle konnte nicht geladen werden</h3>
+        <p class="api-fallback-desc">
+          {{- if not $token -}}
+            In der Build-Umgebung fehlt das Secret <code>SLAPI_TOKEN</code>. Ohne diesen Token können keine Live-Tabellen von TeamSL bezogen werden.
+          {{- else if not $isRealLeague -}}
+            Für diese Ansicht ist noch keine gültige DBB-Liga-ID hinterlegt (angegeben: <code>{{ $leagueId | default "leer" }}</code>).
+          {{- else -}}
+            Die Tabelle für Liga <code>{{ $leagueId }}</code> konnte nicht von TeamSL geladen werden ({{ $errorMessage }}).
+          {{- end -}}
+        </p>
+        <div class="api-fallback-checklist">
+          <strong>Fehlerbehebung:</strong>
+          <ul>
+            {{- if not $token -}}
+              <li>Trage das Secret <code>SLAPI_TOKEN</code> in deinen GitHub Actions Secrets ein (<em>Settings &rarr; Secrets and variables &rarr; Actions</em>).</li>
+            {{- else if not $isRealLeague -}}
+              <li>Trage in der Team-Markdown-Datei eine gültige 5-stellige DBB-Liga-ID ein (z. B. <code>league_id="54185"</code>).</li>
+            {{- else -}}
+              <li>Prüfe, ob für Liga <code>{{ $leagueId }}</code> im DBB TeamSL System bereits eine Tabelle existiert.</li>
+            {{- end -}}
+          </ul>
+        </div>
+        <div class="api-fallback-actions">
+          <a href="https://www.basketball-bund.net" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
+            🏀 Tabellen auf basketball-bund.net ansehen ↗
+          </a>
+        </div>
+      </div>
+    </div>
+  {{- end -}}
 </div>

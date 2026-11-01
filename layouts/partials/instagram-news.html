@@ -1,12 +1,13 @@
 {{/*
   Instagram News Feed Component
-  Fetches latest posts from Instagram Graph API or uses local mock data if offline/local.
+  Fetches latest posts from Instagram Graph API or displays clear diagnostic alert if sync failed.
 */}}
 
 {{- $token := os.Getenv "INSTAGRAM_TOKEN" | default (os.Getenv "IG_TOKEN") -}}
 {{- $accountId := os.Getenv "INSTAGRAM_ACCOUNT_ID" | default "17841410542872742" -}}
 {{- $posts := slice -}}
 {{- $isLive := false -}}
+{{- $syncError := "" -}}
 
 {{- if $token -}}
   {{/* 1. Primär: Facebook Graph API mit BG BiBA Account-ID */}}
@@ -17,11 +18,17 @@
     {{- with $json.data -}}
       {{- $posts = . -}}
       {{- $isLive = true -}}
+    {{- else -}}
+      {{- if $json.error -}}
+        {{- $syncError = printf "Graph API: %s" $json.error.message -}}
+      {{- end -}}
     {{- end -}}
+  {{- else if $res.Err -}}
+    {{- $syncError = printf "Graph API HTTP-Fehler: %s" $res.Err -}}
   {{- end -}}
 
   {{/* 2. Fallback: Direkte Instagram Basic Display / User API */}}
-  {{- if eq (len $posts) 0 -}}
+  {{- if and (eq (len $posts) 0) (not $isLive) -}}
     {{- $igEndpoint := printf "https://graph.instagram.com/me/media?fields=id,caption,media_type,media_url,thumbnail_url,permalink,timestamp&limit=6&access_token=%s" $token -}}
     {{- $res := resources.GetRemote $igEndpoint -}}
     {{- if and $res (not $res.Err) -}}
@@ -32,17 +39,8 @@
       {{- end -}}
     {{- end -}}
   {{- end -}}
-{{- end -}}
-
-{{- if eq (len $posts) 0 -}}
-  {{/* Fallback to local sample posts */}}
-  {{- $fallback := resources.Get "data/sample-instagram.json" -}}
-  {{- if $fallback -}}
-    {{- $json := $fallback | transform.Unmarshal -}}
-    {{- with $json.data -}}
-      {{- $posts = . -}}
-    {{- end -}}
-  {{- end -}}
+{{- else -}}
+  {{- $syncError = "Secret INSTAGRAM_TOKEN fehlt in der Build-Umgebung" -}}
 {{- end -}}
 
 <div class="instagram-news-wrapper">
@@ -52,7 +50,7 @@
       {{- if $isLive -}}
         <span class="badge badge-live">● Live Sync</span>
       {{- else -}}
-        <span class="badge badge-demo">Vorschau</span>
+        <span class="badge badge-error">⚠️ Sync fehlgeschlagen</span>
       {{- end -}}
     </div>
     <div class="feed-header-right">
@@ -63,73 +61,106 @@
     </div>
   </div>
 
-  <div class="instagram-grid">
-    {{- range $index, $post := $posts -}}
-      {{- $mediaUrl := $post.media_url -}}
-      {{- $thumbUrl := $post.thumbnail_url | default $mediaUrl -}}
-      {{- $caption := $post.caption | default "" -}}
-      {{- $type := $post.media_type | default "IMAGE" -}}
-      {{- $permalink := $post.permalink | default "https://www.instagram.com/bgbiba/" -}}
-      {{- $date := "" -}}
-      {{- with $post.timestamp -}}
-        {{- $parsed := time.AsTime . -}}
-        {{- $date = $parsed.Format "02.01.2006" -}}
-      {{- end -}}
+  {{- if and $isLive (gt (len $posts) 0) -}}
+    <div class="instagram-grid">
+      {{- range $index, $post := $posts -}}
+        {{- $mediaUrl := $post.media_url -}}
+        {{- $thumbUrl := $post.thumbnail_url | default $mediaUrl -}}
+        {{- $caption := $post.caption | default "" -}}
+        {{- $type := $post.media_type | default "IMAGE" -}}
+        {{- $permalink := $post.permalink | default "https://www.instagram.com/bgbiba/" -}}
+        {{- $date := "" -}}
+        {{- with $post.timestamp -}}
+          {{- $parsed := time.AsTime . -}}
+          {{- $date = $parsed.Format "02.01.2006" -}}
+        {{- end -}}
 
-      <article class="instagram-card" 
-               tabindex="0" 
-               role="button" 
-               aria-haspopup="dialog"
-               aria-label="Instagram Beitrag vom {{ $date }} öffnen"
-               data-id="{{ $post.id }}"
-               data-type="{{ $type }}"
-               data-media="{{ $mediaUrl }}"
-               data-thumb="{{ $thumbUrl }}"
-               data-permalink="{{ $permalink }}"
-               data-date="{{ $date }}">
-        
-        <div class="instagram-card-media">
-          <img src="{{ $thumbUrl }}" alt="BG BiBA Instagram News Post" loading="lazy" />
-          <div class="media-type-badge">
+        <article class="instagram-card" 
+                 tabindex="0" 
+                 role="button" 
+                 aria-haspopup="dialog"
+                 aria-label="Instagram Beitrag vom {{ $date }} öffnen"
+                 data-id="{{ $post.id }}"
+                 data-type="{{ $type }}"
+                 data-media="{{ $mediaUrl }}"
+                 data-thumb="{{ $thumbUrl }}"
+                 data-permalink="{{ $permalink }}"
+                 data-date="{{ $date }}">
+          
+          <div class="instagram-card-media">
+            <img src="{{ $thumbUrl }}" alt="BG BiBA Instagram News Post" loading="lazy" />
+            <div class="media-type-badge">
+              {{- if eq $type "VIDEO" -}}
+                <span title="Video / Reel">🎬 Reel</span>
+              {{- else if eq $type "CAROUSEL_ALBUM" -}}
+                <span title="Bilder-Galerie">📑 Galerie</span>
+              {{- else -}}
+                <span title="Foto">📷 Foto</span>
+              {{- end -}}
+            </div>
             {{- if eq $type "VIDEO" -}}
-              <span title="Video / Reel">🎬 Reel</span>
-            {{- else if eq $type "CAROUSEL_ALBUM" -}}
-              <span title="Bilder-Galerie">📑 Galerie</span>
-            {{- else -}}
-              <span title="Foto">📷 Foto</span>
+              <div class="video-play-overlay" aria-hidden="true">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+              </div>
             {{- end -}}
           </div>
-          {{- if eq $type "VIDEO" -}}
-            <div class="video-play-overlay" aria-hidden="true">
-              <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+
+          <div class="instagram-card-body">
+            <div class="instagram-card-meta">
+              <span class="post-date">📅 {{ $date }}</span>
             </div>
+            <p class="instagram-card-caption">
+              {{- $caption | truncate 130 " …" -}}
+            </p>
+            <div class="instagram-card-cta">
+              <span class="cta-link">Mehr lesen &rarr;</span>
+            </div>
+          </div>
+
+          {{/* Versteckter Volltext für das Modal */}}
+          <template class="post-full-caption">{{ $caption }}</template>
+        </article>
+      {{- end -}}
+    </div>
+
+    <div class="instagram-footer-cta">
+      <a href="https://www.instagram.com/bgbiba/" target="_blank" rel="noopener noreferrer" class="btn btn-primary instagram-main-btn">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+        <span>Alle Beiträge auf Instagram ansehen</span>
+      </a>
+    </div>
+  {{- else -}}
+    {{/* Eindeutige Fehlermeldung statt verwirrender Dummy-Inhalte */}}
+    <div class="api-fallback-box api-fallback-warning instagram-error-box">
+      <div class="api-fallback-header">
+        <span class="badge badge-error">⚠️ Keine Instagram-Beiträge geladen</span>
+        <span class="api-fallback-meta">Kanal: @bgbiba</span>
+      </div>
+      <div class="api-fallback-content">
+        <h3 class="api-fallback-title">Instagram-News nicht verfügbar</h3>
+        <p class="api-fallback-desc">
+          {{- if not $token -}}
+            Die Beiträge konnten beim Website-Build nicht abgerufen werden, da das Secret <code>INSTAGRAM_TOKEN</code> in den GitHub Actions Secrets nicht hinterlegt ist.
+          {{- else -}}
+            Die Beiträge konnten von der Instagram Graph API nicht geladen werden ({{ $syncError }}). Möglicherweise ist das Token abgelaufen oder Meta verwehrt den Zugriff.
           {{- end -}}
+        </p>
+        <div class="api-fallback-checklist">
+          <strong>So behebst du diesen Fehler:</strong>
+          <ul>
+            <li>Hinterlege das Secret <code>INSTAGRAM_TOKEN</code> in deinem GitHub-Repository unter <em>Settings &rarr; Secrets and variables &rarr; Actions</em>.</li>
+            <li>Der vorgelagerte Token-Refresh-Schritt im GitHub Workflow erneuert diesen Token anschließend automatisch alle 6 Stunden.</li>
+          </ul>
         </div>
-
-        <div class="instagram-card-body">
-          <div class="instagram-card-meta">
-            <span class="post-date">📅 {{ $date }}</span>
-          </div>
-          <p class="instagram-card-caption">
-            {{- $caption | truncate 130 " …" -}}
-          </p>
-          <div class="instagram-card-cta">
-            <span class="cta-link">Mehr lesen &rarr;</span>
-          </div>
+        <div class="api-fallback-actions">
+          <a href="https://www.instagram.com/bgbiba/" target="_blank" rel="noopener noreferrer" class="btn btn-primary">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
+            <span>Aktuelle Beiträge direkt auf Instagram ansehen ↗</span>
+          </a>
         </div>
-
-        {{/* Versteckter Volltext für das Modal */}}
-        <template class="post-full-caption">{{ $caption }}</template>
-      </article>
-    {{- end -}}
-  </div>
-
-  <div class="instagram-footer-cta">
-    <a href="https://www.instagram.com/bgbiba/" target="_blank" rel="noopener noreferrer" class="btn btn-primary instagram-main-btn">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-      <span>Alle Beiträge auf Instagram ansehen</span>
-    </a>
-  </div>
+      </div>
+    </div>
+  {{- end -}}
 </div>
 
 {{/* Barrierefreier nativer HTML5 Modal Dialog (gemäß modern-web-guidance) */}}

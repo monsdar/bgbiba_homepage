@@ -78,6 +78,26 @@ jobs:
           GA_MEASUREMENT_ID: ${{ secrets.GA_MEASUREMENT_ID }}
           INSTAGRAM_TOKEN: ${{ env.ACTIVE_IG_TOKEN || secrets.INSTAGRAM_TOKEN }}
         run: |
+          echo "=== Prüfe Verfügbarkeit der externen Secrets ==="
+          if [ -z "$BS_ID" ] || [ -z "$BS_SECRET" ]; then
+            echo "::warning title=BookStack Secrets fehlen::BS_ID oder BS_SECRET ist nicht in GitHub Secrets hinterlegt. Wiki-Inhalte werden als Fallback-Hinweis gerendert."
+          else
+            echo "✓ BookStack Secrets vorhanden."
+          fi
+
+          if [ -z "$SLAPI_TOKEN" ]; then
+            echo "::warning title=SLAPI_TOKEN fehlt::SLAPI_TOKEN ist nicht in GitHub Secrets hinterlegt. TeamSL-Spieldaten und Tabellen werden als Fallback-Hinweis gerendert."
+          else
+            echo "✓ SLAPI_TOKEN vorhanden."
+          fi
+
+          if [ -z "$INSTAGRAM_TOKEN" ]; then
+            echo "::warning title=INSTAGRAM_TOKEN fehlt::INSTAGRAM_TOKEN ist nicht in GitHub Secrets hinterlegt. Instagram-News werden als Fallback-Hinweis gerendert."
+          else
+            echo "✓ INSTAGRAM_TOKEN vorhanden."
+          fi
+          echo "==============================================="
+
           hugo \
             --minify \
             --baseURL "${{ steps.pages.outputs.base_url }}/"
