@@ -70,6 +70,37 @@
   {{- $teamIdStr = trim (printf "%v" .) " " -}}
 {{- end -}}
 
+{{/* Lade und normalisiere alle Vereinslogos aus dbb_logos/ einmalig */}}
+{{- $rawLogos := resources.Match "dbb_logos/*" -}}
+{{- $logoEntries := slice -}}
+{{- $bibaDefaultLogo := false -}}
+{{- range $rawLogos -}}
+  {{- $ext := lower (path.Ext .Name) -}}
+  {{- if in (slice ".svg" ".png" ".jpg" ".jpeg" ".webp") $ext -}}
+    {{- $base := path.BaseName .Name | lower -}}
+    {{- $norm := $base -}}
+    {{- $norm = replace $norm "ä" "ae" -}}
+    {{- $norm = replace $norm "a\u0308" "ae" -}}
+    {{- $norm = replace $norm "ö" "oe" -}}
+    {{- $norm = replace $norm "o\u0308" "oe" -}}
+    {{- $norm = replace $norm "ü" "ue" -}}
+    {{- $norm = replace $norm "u\u0308" "ue" -}}
+    {{- $norm = replace $norm "ß" "ss" -}}
+    {{- $norm = replaceRE "[-_/\\s]+" " " $norm -}}
+    {{- $norm = replaceRE "[^a-z0-9 ]" "" $norm -}}
+    {{- $norm = trim $norm " " -}}
+    {{- if eq $norm "bierden bassen" -}}
+      {{- $bibaDefaultLogo = . -}}
+    {{- end -}}
+    {{- if $norm -}}
+      {{- $logoEntries = $logoEntries | append (dict "key" $norm "len" (len $norm) "res" .) -}}
+    {{- end -}}
+  {{- end -}}
+{{- end -}}
+{{- if gt (len $logoEntries) 1 -}}
+  {{- $logoEntries = sort $logoEntries "len" "desc" -}}
+{{- end -}}
+
 <div class="teamsl-matches-wrapper">
   <div class="matches-header">
     <div class="header-titles">
@@ -156,19 +187,19 @@
         {{- $isBibaHome := or (in (lower $home) "biba") (in (lower $home) "bierden") (eq $homeClubId "4189") -}}
         {{- $isBibaAway := or (in (lower $away) "biba") (in (lower $away) "bierden") (eq $awayClubId "4189") -}}
 
+        {{- $homeId := printf "%v" (or .home_team.id "") -}}
+        {{- $homeSeasonId := printf "%v" (or .home_team.season_team_id "") -}}
+        {{- $homePermId := printf "%v" (or .home_team.team_permanent_id "") -}}
+        {{- $awayId := printf "%v" (or .away_team.id "") -}}
+        {{- $awaySeasonId := printf "%v" (or .away_team.season_team_id "") -}}
+        {{- $awayPermId := printf "%v" (or .away_team.team_permanent_id "") -}}
+
         {{- $isTargetHome := false -}}
         {{- $isTargetAway := false -}}
         {{- if $teamIdStr -}}
-          {{- $homeId := printf "%v" (or .home_team.id "") -}}
-          {{- $homeSeasonId := printf "%v" (or .home_team.season_team_id "") -}}
-          {{- $homePermId := printf "%v" (or .home_team.team_permanent_id "") -}}
           {{- if or (eq $homeId $teamIdStr) (eq $homeSeasonId $teamIdStr) (eq $homePermId $teamIdStr) -}}
             {{- $isTargetHome = true -}}
           {{- end -}}
-
-          {{- $awayId := printf "%v" (or .away_team.id "") -}}
-          {{- $awaySeasonId := printf "%v" (or .away_team.season_team_id "") -}}
-          {{- $awayPermId := printf "%v" (or .away_team.team_permanent_id "") -}}
           {{- if or (eq $awayId $teamIdStr) (eq $awaySeasonId $teamIdStr) (eq $awayPermId $teamIdStr) -}}
             {{- $isTargetAway = true -}}
           {{- end -}}
@@ -187,38 +218,186 @@
           {{- $highlightAway = $isTargetAway -}}
         {{- end -}}
 
-        <div class="match-card {{ if $cardIsBiba }}match-biba{{ end }}">
-          <div class="match-meta">
-            {{- if and (gt (len $targetLeagues) 1) ._league_label -}}
-              <span class="badge badge-small-biba">{{ ._league_label }}</span>
+        {{/* Teamnamen bereinigen & BiBA-Mannschaftsnamen ersetzen (z. B. "BiBA Herren", "BiBA mU12.2") */}}
+        {{- $homeClean := trim (replaceRE "(?i)\\s+(-RST-|a\\.?K\\.?)\\s*$" "" $home) " " -}}
+        {{- $awayClean := trim (replaceRE "(?i)\\s+(-RST-|a\\.?K\\.?)\\s*$" "" $away) " " -}}
+        {{- $homeDisplay := $homeClean -}}
+        {{- $awayDisplay := $awayClean -}}
+
+        {{- if $isBibaHome -}}
+          {{- $mapped := "" -}}
+          {{- with site.Params.biba_team_names -}}
+            {{- $mapped = or (index . $homeId) (index . $homeSeasonId) (index . $homePermId) (cond $isTargetHome (index . $teamIdStr) "") "" -}}
+          {{- end -}}
+          {{- if $mapped -}}
+            {{- $homeDisplay = $mapped -}}
+          {{- else if ._league_label -}}
+            {{- if eq ._league_label "mU12" -}}
+              {{- if findRE "(?i)\\s+(2|II)$" $homeClean -}}
+                {{- $homeDisplay = "BiBA mU12.2" -}}
+              {{- else if findRE "(?i)\\s+(1|I)$" $homeClean -}}
+                {{- $homeDisplay = "BiBA mU12.1" -}}
+              {{- else -}}
+                {{- $homeDisplay = "BiBA mU12" -}}
+              {{- end -}}
+            {{- else -}}
+              {{- if findRE "(?i)\\s+(2|II)$" $homeClean -}}
+                {{- $homeDisplay = printf "BiBA %s.2" ._league_label -}}
+              {{- else -}}
+                {{- $homeDisplay = printf "BiBA %s" ._league_label -}}
+              {{- end -}}
             {{- end -}}
-            <span class="match-date">{{ $dateStr }}</span>
-            <span class="match-time">{{ $timeStr }} Uhr</span>
+          {{- else -}}
+            {{- $homeDisplay = "BG BiBA" -}}
+          {{- end -}}
+        {{- end -}}
+
+        {{- if $isBibaAway -}}
+          {{- $mapped := "" -}}
+          {{- with site.Params.biba_team_names -}}
+            {{- $mapped = or (index . $awayId) (index . $awaySeasonId) (index . $awayPermId) (cond $isTargetAway (index . $teamIdStr) "") "" -}}
+          {{- end -}}
+          {{- if $mapped -}}
+            {{- $awayDisplay = $mapped -}}
+          {{- else if ._league_label -}}
+            {{- if eq ._league_label "mU12" -}}
+              {{- if findRE "(?i)\\s+(2|II)$" $awayClean -}}
+                {{- $awayDisplay = "BiBA mU12.2" -}}
+              {{- else if findRE "(?i)\\s+(1|I)$" $awayClean -}}
+                {{- $awayDisplay = "BiBA mU12.1" -}}
+              {{- else -}}
+                {{- $awayDisplay = "BiBA mU12" -}}
+              {{- end -}}
+            {{- else -}}
+              {{- if findRE "(?i)\\s+(2|II)$" $awayClean -}}
+                {{- $awayDisplay = printf "BiBA %s.2" ._league_label -}}
+              {{- else -}}
+                {{- $awayDisplay = printf "BiBA %s" ._league_label -}}
+              {{- end -}}
+            {{- end -}}
+          {{- else -}}
+            {{- $awayDisplay = "BG BiBA" -}}
+          {{- end -}}
+        {{- end -}}
+
+        {{/* Vereinslogos via Substring-Matching aus dbb_logos/ ermitteln */}}
+        {{- $homeLogo := false -}}
+        {{- if and $isBibaHome $bibaDefaultLogo -}}
+          {{- $homeLogo = $bibaDefaultLogo -}}
+        {{- else -}}
+          {{- $normHome := lower $home -}}
+          {{- $normHome = replace $normHome "ä" "ae" -}}
+          {{- $normHome = replace $normHome "a\u0308" "ae" -}}
+          {{- $normHome = replace $normHome "ö" "oe" -}}
+          {{- $normHome = replace $normHome "o\u0308" "oe" -}}
+          {{- $normHome = replace $normHome "ü" "ue" -}}
+          {{- $normHome = replace $normHome "u\u0308" "ue" -}}
+          {{- $normHome = replace $normHome "ß" "ss" -}}
+          {{- $normHome = replaceRE "[-_/\\s]+" " " $normHome -}}
+          {{- $normHome = replaceRE "[^a-z0-9 ]" "" $normHome -}}
+          {{- $normHome = trim $normHome " " -}}
+          {{- range $logoEntries -}}
+            {{- if and (not $homeLogo) (in $normHome .key) -}}
+              {{- $homeLogo = .res -}}
+            {{- end -}}
+          {{- end -}}
+        {{- end -}}
+
+        {{- $awayLogo := false -}}
+        {{- if and $isBibaAway $bibaDefaultLogo -}}
+          {{- $awayLogo = $bibaDefaultLogo -}}
+        {{- else -}}
+          {{- $normAway := lower $away -}}
+          {{- $normAway = replace $normAway "ä" "ae" -}}
+          {{- $normAway = replace $normAway "a\u0308" "ae" -}}
+          {{- $normAway = replace $normAway "ö" "oe" -}}
+          {{- $normAway = replace $normAway "o\u0308" "oe" -}}
+          {{- $normAway = replace $normAway "ü" "ue" -}}
+          {{- $normAway = replace $normAway "u\u0308" "ue" -}}
+          {{- $normAway = replace $normAway "ß" "ss" -}}
+          {{- $normAway = replaceRE "[-_/\\s]+" " " $normAway -}}
+          {{- $normAway = replaceRE "[^a-z0-9 ]" "" $normAway -}}
+          {{- $normAway = trim $normAway " " -}}
+          {{- range $logoEntries -}}
+            {{- if and (not $awayLogo) (in $normAway .key) -}}
+              {{- $awayLogo = .res -}}
+            {{- end -}}
+          {{- end -}}
+        {{- end -}}
+
+        {{- $homeLetters := replaceRE "[^A-Za-zÄÖÜäöüß0-9]" "" $homeDisplay -}}
+        {{- $homeInitials := cond (ge (strings.RuneCount $homeLetters) 2) (substr $homeLetters 0 2 | upper) ($homeLetters | upper | default "BB") -}}
+        {{- $awayLetters := replaceRE "[^A-Za-zÄÖÜäöüß0-9]" "" $awayDisplay -}}
+        {{- $awayInitials := cond (ge (strings.RuneCount $awayLetters) 2) (substr $awayLetters 0 2 | upper) ($awayLetters | upper | default "BB") -}}
+
+        {{/* Sieg / Niederlage Auswertung für linken Rahmen-Akzent & Score-Hervorhebung */}}
+        {{- $scoreHome := int (or .score_home 0) -}}
+        {{- $scoreAway := int (or .score_away 0) -}}
+        {{- $homeWon := and .is_finished (gt $scoreHome $scoreAway) -}}
+        {{- $awayWon := and .is_finished (gt $scoreAway $scoreHome) -}}
+
+        {{- $statusClass := "match-upcoming" -}}
+        {{- if .is_finished -}}
+          {{- if and $highlightHome (not $highlightAway) -}}
+            {{- if $homeWon -}}
+              {{- $statusClass = "match-win" -}}
+            {{- else if $awayWon -}}
+              {{- $statusClass = "match-loss" -}}
+            {{- end -}}
+          {{- else if and $highlightAway (not $highlightHome) -}}
+            {{- if $awayWon -}}
+              {{- $statusClass = "match-win" -}}
+            {{- else if $homeWon -}}
+              {{- $statusClass = "match-loss" -}}
+            {{- end -}}
+          {{- else if and $highlightHome $highlightAway -}}
+            {{- $statusClass = "match-win" -}}
+          {{- else -}}
+            {{- $statusClass = "match-finished" -}}
+          {{- end -}}
+        {{- else if .is_cancelled -}}
+          {{- $statusClass = "match-cancelled" -}}
+        {{- end -}}
+
+        <div class="match-card {{ if $cardIsBiba }}match-biba{{ end }} {{ $statusClass }}">
+          <div class="match-meta">
+            <span class="match-datetime">
+              <span class="match-date">{{ $dateStr }}</span>
+              <span class="match-meta-sep" aria-hidden="true">&middot;</span>
+              <span class="match-time">{{ $timeStr }} Uhr</span>
+            </span>
             {{- with .location -}}
               <span class="match-venue" title="{{ . }}">📍 {{ . }}</span>
             {{- end -}}
+            {{- if and .is_cancelled (not .is_finished) -}}
+              <span class="badge badge-cancelled">Abgesagt</span>
+            {{- end -}}
           </div>
 
-          <div class="match-teams-box">
-            <div class="team team-home {{ if $highlightHome }}is-biba{{ end }}">
-              <span class="team-name">{{ $home }}</span>
+          <div class="match-teams-stacked">
+            <div class="team-row team-home {{ if $highlightHome }}is-biba{{ end }} {{ if $homeWon }}is-winner{{ else if $awayWon }}is-loser{{ end }}">
+              <div class="team-identity">
+                {{- if $homeLogo -}}
+                  <img src="{{ $homeLogo.RelPermalink }}" alt="" class="team-logo" width="28" height="28" loading="lazy">
+                {{- else -}}
+                  <span class="team-logo-placeholder" aria-hidden="true">{{ $homeInitials }}</span>
+                {{- end -}}
+                <span class="team-name">{{ $homeDisplay }}</span>
+              </div>
               {{- if .is_finished -}}
                 <span class="team-score">{{ .score_home }}</span>
               {{- end -}}
             </div>
 
-            <div class="match-versus">
-              {{- if .is_finished -}}
-                <span class="badge badge-final">Endstand</span>
-              {{- else if .is_cancelled -}}
-                <span class="badge badge-cancelled">Abgesagt</span>
-              {{- else -}}
-                <span class="badge badge-vs">VS</span>
-              {{- end -}}
-            </div>
-
-            <div class="team team-away {{ if $highlightAway }}is-biba{{ end }}">
-              <span class="team-name">{{ $away }}</span>
+            <div class="team-row team-away {{ if $highlightAway }}is-biba{{ end }} {{ if $awayWon }}is-winner{{ else if $homeWon }}is-loser{{ end }}">
+              <div class="team-identity">
+                {{- if $awayLogo -}}
+                  <img src="{{ $awayLogo.RelPermalink }}" alt="" class="team-logo" width="28" height="28" loading="lazy">
+                {{- else -}}
+                  <span class="team-logo-placeholder" aria-hidden="true">{{ $awayInitials }}</span>
+                {{- end -}}
+                <span class="team-name">{{ $awayDisplay }}</span>
+              </div>
               {{- if .is_finished -}}
                 <span class="team-score">{{ .score_away }}</span>
               {{- end -}}

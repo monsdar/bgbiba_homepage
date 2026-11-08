@@ -31,6 +31,9 @@ timeout = '60s'
   [[module.mounts]]
     source = 'slideshow'
     target = 'assets/slideshow'
+  [[module.mounts]]
+    source = 'dbb_logos'
+    target = 'assets/dbb_logos'
 
 
 
@@ -88,6 +91,19 @@ timeout = '60s'
     54180 = 'wU14'
     54185 = 'mU12'
     54188 = 'U10 Mixed'
+
+  [params.biba_team_names]
+    448402 = 'BiBA Herren'
+    448410 = 'BiBA Mixed'
+    454352 = 'BiBA wU18'
+    453376 = 'BiBA mU18'
+    453797 = 'BiBA mU16'
+    448468 = 'BiBA wU16'
+    448488 = 'BiBA mU14'
+    448493 = 'BiBA wU14'
+    457177 = 'BiBA mU12.1'
+    457178 = 'BiBA mU12.2'
+    448537 = 'BiBA U10 Mixed'
 
 # Navigation
 [[menu.main]]
