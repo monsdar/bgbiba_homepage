@@ -192,6 +192,8 @@
 
   main {
     flex: 1;
+    inline-size: 100%;
+    min-inline-size: 0;
   }
 }
 
@@ -201,10 +203,10 @@
 @layer components {
   /* Container */
   .container {
-    width: 100%;
-    max-width: var(--container-max);
+    inline-size: 100%;
+    max-inline-size: var(--container-max);
     margin-inline: auto;
-    padding-inline: 1.5rem;
+    padding-inline: clamp(1rem, 4vw, 1.5rem);
   }
 
   /* Topbar: 30% Structural Color BiBA-Blau (#412774) with pure white text (#FFFFFF) */
@@ -212,7 +214,7 @@
     background-color: var(--biba-blue);
     color: var(--biba-white);
     font-size: 0.825rem;
-    padding: 0.45rem 0;
+    padding-block: 0.45rem;
     border-bottom: 1px solid rgba(255, 255, 255, 0.15);
   }
 
@@ -411,7 +413,7 @@
       radial-gradient(circle at 15% 85%, rgba(65, 39, 116, 0.45) 0%, rgba(65, 39, 116, 0) 55%),
       linear-gradient(135deg, var(--biba-bg-dark) 0%, #191229 65%, var(--biba-blue) 100%);
     color: var(--biba-white);
-    padding: 4.5rem 0 4rem;
+    padding-block: 4.5rem 4rem;
     position: relative;
     overflow: hidden;
     border-bottom: 4px solid var(--biba-red);
@@ -774,7 +776,7 @@
 
   /* Sections (60% Neutral Backgrounds: #F2F2F2 default, #FFFFFF alt) */
   .section {
-    padding: 4rem 0;
+    padding-block: 4rem;
   }
 
   .section-alt {
@@ -793,9 +795,10 @@
   }
 
   .section-title {
-    font-size: 2rem;
+    font-size: clamp(1.5rem, 1.2rem + 1.5vw, 2rem);
     letter-spacing: -0.02em;
     color: var(--biba-black);
+    overflow-wrap: break-word;
   }
 
   .section-subtitle {
@@ -818,6 +821,11 @@
   }
 
   /* Interior Page Layouts */
+  .page-article {
+    inline-size: 100%;
+    min-inline-size: 0;
+  }
+
   .page-header {
     margin-bottom: 2rem;
     border-bottom: 2px solid var(--border-color);
@@ -838,9 +846,10 @@
   }
 
   .page-title {
-    font-size: 2.5rem;
+    font-size: clamp(1.75rem, 1.3rem + 2.2vw, 2.5rem);
     margin-bottom: 0.5rem;
     color: var(--biba-black);
+    overflow-wrap: break-word;
   }
 
   .page-description {
@@ -851,6 +860,8 @@
   .page-content {
     font-size: 1.05rem;
     line-height: 1.75;
+    min-inline-size: 0;
+    overflow-wrap: break-word;
   }
 
   .page-content-narrow {
@@ -879,6 +890,34 @@
     border-top: 1px solid var(--border-color);
   }
 
+  /* Tables inside prose / BookStack Wiki content */
+  .page-content :where(table):not(.standings-table) {
+    display: block;
+    inline-size: 100%;
+    max-inline-size: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    border-collapse: collapse;
+    margin-block: 1.25rem;
+    background: var(--biba-white);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius-sm);
+    font-size: 0.95rem;
+  }
+
+  .page-content :where(table):not(.standings-table) :where(th, td) {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--border-color);
+    text-align: start;
+    vertical-align: top;
+  }
+
+  .page-content :where(table):not(.standings-table) th {
+    background: var(--biba-bg-bright);
+    font-weight: 700;
+    color: var(--biba-black);
+  }
+
   .cta-button-group {
     display: flex;
     gap: 1rem;
@@ -889,7 +928,7 @@
   /* Cards Grid (#FFFFFF surface on #F2F2F2 background) */
   .cards-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr));
     gap: 1.5rem;
   }
 
@@ -1355,7 +1394,7 @@
   .footer {
     background-color: var(--biba-bg-dark);
     color: #d4d4d4;
-    padding: 4rem 0 2rem;
+    padding-block: 4rem 2rem;
     margin-top: auto;
     border-top: 4px solid var(--biba-red);
   }
@@ -1553,7 +1592,7 @@
 
   .instagram-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
     gap: 1.5rem;
   }
 
@@ -2035,9 +2074,13 @@
   /* Matches Overview Grid (Homepage: Letzte Ergebnisse & Kommende Spiele) */
   .matches-overview-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
     gap: 2rem;
     align-items: start;
+  }
+
+  .matches-overview-grid > * {
+    min-inline-size: 0;
   }
 
   /* Team Contact Banner & Contact Form */
@@ -2117,7 +2160,7 @@
 
   .form-row-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
     gap: 1.25rem;
   }
 
@@ -2242,8 +2285,90 @@
   }
 
   @media (max-width: 768px) {
+    .hero {
+      padding-block: 2.75rem 2.5rem;
+    }
+
     .hero h1 {
-      font-size: 2.25rem;
+      font-size: 2.15rem;
+    }
+
+    .hero-slideshow::before {
+      inset: 6px -4px -6px 6px;
+    }
+
+    .section {
+      padding-block: 2.5rem;
+    }
+
+    .section-header {
+      margin-bottom: 1.75rem;
+    }
+
+    .section-divider,
+    .page-content hr {
+      margin-block: 2rem;
+    }
+
+    .page-header {
+      margin-bottom: 1.5rem;
+      padding-bottom: 1.25rem;
+    }
+
+    .page-description {
+      font-size: 1.05rem;
+    }
+
+    .card,
+    .contact-card {
+      padding: 1.25rem;
+    }
+
+    .team-contact-banner {
+      padding: 1rem;
+    }
+
+    .team-contact-banner-actions {
+      inline-size: 100%;
+    }
+
+    .team-contact-banner-actions .btn {
+      flex: 1 1 auto;
+    }
+
+    .contact-submit-btn {
+      inline-size: 100%;
+    }
+
+    .matches-header,
+    .standings-header {
+      padding: 0.85rem 1rem;
+    }
+
+    .match-card {
+      padding: 0.9rem 1rem;
+    }
+
+    .api-fallback-box {
+      padding: 1.15rem;
+    }
+
+    .api-fallback-box.api-fallback-embedded {
+      margin: 0.85rem;
+    }
+
+    .standings-table {
+      font-size: 0.875rem;
+    }
+
+    .standings-table th,
+    .standings-table td {
+      padding: 0.65rem 0.6rem;
+    }
+
+    .standings-table .col-stat,
+    .standings-table .col-pos {
+      white-space: nowrap;
     }
 
     .mobile-nav-toggle {
@@ -2280,6 +2405,10 @@
 
     .nav-link:hover {
       background-color: var(--biba-bg-bright);
+    }
+
+    .footer {
+      padding-block: 3rem 1.75rem;
     }
 
     .footer-grid {
