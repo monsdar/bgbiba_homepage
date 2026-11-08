@@ -9,11 +9,11 @@
     <div>
       <h3 class="contact-card-title">{{ $heading }}</h3>
       <p class="contact-card-subtitle">
-        Direkter Kontakt per E-Mail an <a href="mailto:{{ $recipient }}" class="contact-email-link"><strong>{{ $recipient }}</strong></a>
+        Direkter Kontakt per Email an <a href="mailto:{{ $recipient }}" class="contact-email-link"><strong>{{ $recipient }}</strong></a>
       </p>
     </div>
     <a href="mailto:{{ $recipient }}?subject={{ $defaultSubject | urlquery }}" class="btn btn-outline btn-sm">
-      ✉️ Direkt im E-Mail-Programm öffnen
+      ✉️ Direkt im Email-Programm öffnen
     </a>
   </div>
 
@@ -38,7 +38,7 @@
         </div>
 
         <div class="form-group">
-          <label for="{{ $formId }}-email" class="form-label">Deine E-Mail-Adresse <span class="required-marker" aria-hidden="true">*</span></label>
+          <label for="{{ $formId }}-email" class="form-label">Deine Email-Adresse <span class="required-marker" aria-hidden="true">*</span></label>
           <input
             type="email"
             id="{{ $formId }}-email"
@@ -88,7 +88,7 @@
 
       <div class="form-actions">
         <button type="submit" class="btn btn-primary contact-submit-btn">
-          ✉️ E-Mail an {{ $recipient }} vorbereiten &amp; senden
+          ✉️ Email an {{ $recipient }} vorbereiten &amp; senden
         </button>
       </div>
 
@@ -111,7 +111,7 @@
       return 'Bitte fülle dieses Pflichtfeld aus.';
     }
     if (input.validity.typeMismatch && input.type === 'email') {
-      return 'Bitte gib eine gültige E-Mail-Adresse ein (z. B. name@beispiel.de).';
+      return 'Bitte gib eine gültige Email-Adresse ein (z. B. name@beispiel.de).';
     }
     return '';
   }
@@ -177,7 +177,7 @@
 
     if (statusBox) {
       statusBox.hidden = false;
-      statusBox.textContent = 'Dein E-Mail-Programm wurde mit deiner Nachricht an ' + recipient + ' geöffnet. Falls sich kein Programm geöffnet hat, sende deine Nachricht bitte direkt an ' + recipient + '.';
+      statusBox.textContent = 'Dein Email-Programm wurde mit deiner Nachricht an ' + recipient + ' geöffnet. Falls sich kein Programm geöffnet hat, sende deine Nachricht bitte direkt an ' + recipient + '.';
     }
   });
 })();

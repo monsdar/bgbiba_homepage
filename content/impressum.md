@@ -13,7 +13,7 @@ Spielgemeinschaft der Vereine:
 
 **Vertreten durch:**  
 Die Vorstände der beteiligten Stammvereine.  
-E-Mail: [info@bgbiba.net](mailto:info@bgbiba.net)  
+Email: [info@bgbiba.net](mailto:info@bgbiba.net)  
 Website: [www.bgbiba.de](https://bgbiba.de)
 
 ---

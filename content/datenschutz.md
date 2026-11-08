@@ -12,7 +12,7 @@ Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit deinen
 * **Wer ist verantwortlich für die Datenerfassung?**  
   Die Datenverarbeitung auf dieser Website erfolgt durch die BG BiBA. Die Kontaktdaten findest du im [Impressum](/impressum/).
 * **Wie erfassen wir deine Daten?**  
-  Deine Daten werden zum einen dadurch erhoben, dass du uns diese mitteilst (z. B. per E-Mail). Andere Daten werden automatisch oder nach deiner Einwilligung beim Besuch der Website durch unsere IT-Systeme erfasst (z. B. technische Daten wie Internetbrowser, Betriebssystem oder Uhrzeit des Seitenaufrufs).
+  Deine Daten werden zum einen dadurch erhoben, dass du uns diese mitteilst (z. B. per Email). Andere Daten werden automatisch oder nach deiner Einwilligung beim Besuch der Website durch unsere IT-Systeme erfasst (z. B. technische Daten wie Internetbrowser, Betriebssystem oder Uhrzeit des Seitenaufrufs).
 
 ---
 
