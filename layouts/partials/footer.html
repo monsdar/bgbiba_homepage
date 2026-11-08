@@ -15,10 +15,12 @@
         <h4>Navigation</h4>
         <ul class="footer-links">
           <li><a href="/">Startseite</a></li>
-          <li><a href="/teams/">Teams & Jugend</a></li>
-          <li><a href="/spielbetrieb/">Spielbetrieb & Tabellen</a></li>
-          <li><a href="/verein/">Über uns</a></li>
-          <li><a href="/hallen/">Trainingshallen</a></li>
+          <li><a href="/teams/">Teams</a></li>
+          <li><a href="/mitglied-werden/">Mitglied werden</a></li>
+          <li><a href="/kontakt/">Kontakt</a></li>
+          <li><a href="{{ site.Params.wiki }}" target="_blank" rel="noopener noreferrer">Vereins-Wiki ↗</a></li>
+          <li><a href="{{ site.Params.foerderverein }}" target="_blank" rel="noopener noreferrer">Förderverein ↗</a></li>
+          <li><a href="{{ site.Params.fanshop }}" target="_blank" rel="noopener noreferrer">Fanshop ↗</a></li>
         </ul>
       </div>
 
@@ -26,9 +28,8 @@
         <h4>Stammvereine</h4>
         <ul class="footer-links">
           {{ range site.Params.stammvereine }}
-            <li><a href="{{ .url }}" target="_blank" rel="noopener">{{ .name }} ↗</a></li>
+            <li><a href="{{ .url }}" target="_blank" rel="noopener noreferrer">{{ .name }} ↗</a></li>
           {{ end }}
-          <li style="margin-top: 0.5rem;"><a href="{{ site.Params.foerderverein }}" target="_blank" rel="noopener">Förderverein Bballer4life ↗</a></li>
         </ul>
       </div>
 

@@ -1,0 +1,5 @@
+{{- $recipient := .Get "recipient" | default site.Params.contact_email | default "info@bgbiba.net" -}}
+{{- $subject := .Get "subject" | default "Anfrage über die BG BiBA Website" -}}
+{{- $heading := .Get "heading" | default "Schreib uns eine Nachricht" -}}
+{{ partial "contact-form.html" (dict "recipient" $recipient "subject" $subject "heading" $heading) }}
+

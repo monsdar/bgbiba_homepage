@@ -1,36 +1,37 @@
 {{ define "main" }}
 
-<!-- Hero Section -->
+<!-- Hero Section: Wer wir sind & was wir machen -->
 <section class="hero">
   <div class="container hero-grid">
     <div class="hero-content">
-      <div class="hero-badge">🏀 Offizielle Website der BG BiBA</div>
-      <h1>Basketball mit Herz &amp; Teamgeist in <span>Bierden, Bassen &amp; Achim</span></h1>
+      <div class="hero-badge">🏀 BG BiBA Basketball</div>
+      <h1>Basketball mit Herz &amp; Teamgeist in <span>Achim &amp; Umgebung</span></h1>
       <p class="hero-lead">
-        Willkommen bei der Basketballgemeinschaft Bierden-Bassen-Achim. Gemeinsam stark durch die drei Stammvereine TSV Bierden, TSV Bassen und TSV Achim – vom Minibasketball bis zu den Senioren.
+        Wir sind die BG BiBA – deine Basketballgemeinschaft vor Ort. Bei uns dreht sich alles um den orangenen Ball: Wir bieten Kindern, Jugendlichen und Erwachsenen ein sportliches Zuhause – vom spielerischen Einstieg bei den Minis über den Jugend- und Senioren-Ligabetrieb bis hin zur lockeren Freizeitrunde.
       </p>
       <div class="hero-actions">
-        <a href="/teams/" class="btn btn-primary">🏀 Zu unseren Teams</a>
-        <a href="/spielbetrieb/" class="btn btn-secondary">📅 Spielplan &amp; Tabelle</a>
+        <a href="/teams/" class="btn btn-primary">🏀 Unsere Teams</a>
+        <a href="/mitglied-werden/" class="btn btn-secondary">🤝 Mitglied werden</a>
+        <a href="/kontakt/" class="btn btn-secondary">✉️ Kontakt</a>
       </div>
     </div>
 
     <div class="hero-stats">
       <div class="stat-item">
-        <span class="stat-value">3</span>
-        <span class="stat-label">Stammvereine</span>
+        <span class="stat-value">U10–Ü40</span>
+        <span class="stat-label">Für jedes Alter</span>
       </div>
       <div class="stat-item">
-        <span class="stat-value">12+</span>
-        <span class="stat-label">Teams im Spielbetrieb</span>
+        <span class="stat-value">Minis &amp; Jugend</span>
+        <span class="stat-label">Nachwuchsförderung</span>
+      </div>
+      <div class="stat-item">
+        <span class="stat-value">Liga &amp; Hobby</span>
+        <span class="stat-label">Für jedes Spielniveau</span>
       </div>
       <div class="stat-item">
         <span class="stat-value">100%</span>
         <span class="stat-label">Leidenschaft &amp; Fairplay</span>
-      </div>
-      <div class="stat-item">
-        <span class="stat-value">U10–Ü40</span>
-        <span class="stat-label">Für jedes Alter</span>
       </div>
     </div>
   </div>
@@ -44,136 +45,32 @@
         <h2 class="section-title">Aktuelles &amp; Vereins-News</h2>
         <p class="section-subtitle">Neueste Berichte, Spieltage &amp; Einblicke direkt aus unserem Instagram-Kanal</p>
       </div>
-      <a href="https://www.instagram.com/bgbiba/" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Kanal @bgbiba besuchen &rarr;</a>
+      <a href="{{ site.Params.instagram }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline">Kanal @bgbiba besuchen &rarr;</a>
     </div>
 
     {{ partial "instagram-news.html" . }}
   </div>
 </section>
 
-<!-- Next Matches Widget -->
+<!-- Ergebnisse & Kommende Spiele -->
 <section class="section section-alt">
   <div class="container">
     <div class="section-header">
       <div>
-        <h2 class="section-title">Nächste Spiele</h2>
-        <p class="section-subtitle">Live-Daten aus dem DBB TeamSL Spielbetrieb</p>
+        <h2 class="section-title">Ergebnisse &amp; Kommende Spiele</h2>
+        <p class="section-subtitle">Aktuelle Resultate und nächste Ansetzungen unserer Teams im DBB-Spielbetrieb</p>
       </div>
-      <a href="/spielbetrieb/" class="btn btn-outline">Kompletter Spielplan &rarr;</a>
+      <a href="/teams/" class="btn btn-outline">Zu den Teams &amp; Tabellen &rarr;</a>
     </div>
 
-    {{ partial "teamsl-matches.html" (dict "limit" 4 "only_biba" true) }}
-  </div>
-</section>
-
-<!-- Teams Grid Section -->
-<section class="section section-alt">
-  <div class="container">
-    <div class="section-header">
+    <div class="matches-overview-grid">
       <div>
-        <h2 class="section-title">Unsere Mannschaften</h2>
-        <p class="section-subtitle">Finde das passende Team für deine Alters- und Spielklasse</p>
+        <h3 style="margin-bottom: 1rem; font-size: 1.35rem;">Letzte Ergebnisse</h3>
+        {{ partial "teamsl-matches.html" (dict "limit" 4 "only_biba" true "filter" "finished" "title" "Letzte Ergebnisse") }}
       </div>
-      <a href="/teams/" class="btn btn-outline">Alle Teams ansehen &rarr;</a>
-    </div>
-
-    <div class="cards-grid">
-      <div class="card team-card">
-        <span class="team-card-badge">Senioren</span>
-        <div class="card-icon">⚡</div>
-        <h3 class="card-title">Herren</h3>
-        <p class="card-text">Erwachsenen-Basketball im Liga-Wettkampf. Dynamisches Spiel, intensives Training und starker Teamzusammenhalt.</p>
-        <div class="card-footer">
-          <a href="/teams/herren/" class="btn btn-outline" style="width: 100%;">Teamseite &rarr;</a>
-        </div>
-      </div>
-
-      <div class="card team-card">
-        <span class="team-card-badge">Senioren</span>
-        <div class="card-icon">🔥</div>
-        <h3 class="card-title">Damen</h3>
-        <p class="card-text">Unser Damenteam steht für Spielfreude, Taktik und energiegeladene Spiele auf Verbandsebene.</p>
-        <div class="card-footer">
-          <a href="/teams/damen/" class="btn btn-outline" style="width: 100%;">Teamseite &rarr;</a>
-        </div>
-      </div>
-
-      <div class="card team-card">
-        <span class="team-card-badge">Jugend</span>
-        <div class="card-icon">🎯</div>
-        <h3 class="card-title">Männliche Jugend (U12–U18)</h3>
-        <p class="card-text">Von den Grundlagen bis zur taktischen Finesse: Gezielte Nachwuchsförderung für alle Altersstufen.</p>
-        <div class="card-footer">
-          <a href="/teams/u12-maennlich/" class="btn btn-outline" style="width: 100%;">Zur Jugend &rarr;</a>
-        </div>
-      </div>
-
-      <div class="card team-card">
-        <span class="team-card-badge">Jugend</span>
-        <div class="card-icon">🌟</div>
-        <h3 class="card-title">Weibliche Jugend (U12–U18)</h3>
-        <p class="card-text">Gemeinsam wachsen, Körbe werfen und Teamgeist entwickeln. Spaß und sportliche Entwicklung garantiert.</p>
-        <div class="card-footer">
-          <a href="/teams/u12-weiblich/" class="btn btn-outline" style="width: 100%;">Zur Jugend &rarr;</a>
-        </div>
-      </div>
-
-      <div class="card team-card">
-        <span class="team-card-badge">Minis</span>
-        <div class="card-icon">🏀</div>
-        <h3 class="card-title">U10 Mixed</h3>
-        <p class="card-text">Spielerischer Einstieg in die Welt des Basketballs für unsere jüngsten Nachwuchs-Baller.</p>
-        <div class="card-footer">
-          <a href="/teams/u10-mixed/" class="btn btn-outline" style="width: 100%;">Teamseite &rarr;</a>
-        </div>
-      </div>
-
-      <div class="card team-card">
-        <span class="team-card-badge">Freizeit</span>
-        <div class="card-icon">🎉</div>
-        <h3 class="card-title">Daddeltruppe</h3>
-        <p class="card-text">Freizeit- und Hobbygruppe für alle, die ohne Ligadruck einfach Lust auf ein gepflegtes Basketballspiel haben.</p>
-        <div class="card-footer">
-          <a href="/teams/daddeltruppe/" class="btn btn-outline" style="width: 100%;">Mehr erfahren &rarr;</a>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Community & Sponsoren Section -->
-<section class="section">
-  <div class="container">
-    <div class="section-header">
       <div>
-        <h2 class="section-title">Starke Partner &amp; 3 Stammvereine</h2>
-        <p class="section-subtitle">Die Basis unserer Basketballgemeinschaft</p>
-      </div>
-    </div>
-
-    <div class="cards-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));">
-      <div class="card" style="text-align: center;">
-        <h4 style="margin-top: 0.5rem;">TSV Bierden</h4>
-        <p class="card-text">Gründungs- und Stammverein der BG BiBA.</p>
-        <a href="https://tsv-bierden.de" target="_blank" rel="noopener" class="topbar-link" style="color: var(--color-accent); justify-content: center;">tsv-bierden.de ↗</a>
-      </div>
-
-      <div class="card" style="text-align: center;">
-        <h4 style="margin-top: 0.5rem;">TSV Bassen</h4>
-        <p class="card-text">Starker Partner in der Spielgemeinschaft.</p>
-        <a href="https://tsv-bassen.de" target="_blank" rel="noopener" class="topbar-link" style="color: var(--color-accent); justify-content: center;">tsv-bassen.de ↗</a>
-      </div>
-
-      <div class="card" style="text-align: center;">
-        <h4 style="margin-top: 0.5rem;">TSV Achim</h4>
-        <p class="card-text">Traditionsverein und Kooperationspartner.</p>
-        <a href="https://tsv-achim.de" target="_blank" rel="noopener" class="topbar-link" style="color: var(--color-accent); justify-content: center;">tsv-achim.de ↗</a>
-      </div>
-
-      <div class="card" style="text-align: center; border-color: var(--color-accent);">
-        <h4 style="margin-top: 0.5rem; color: var(--color-accent);">Bballer4life e.V.</h4>
-        <p class="card-text">Förderverein zur Unterstützung der BG BiBA Jugend.</p>
-        <a href="{{ site.Params.foerderverein }}" target="_blank" rel="noopener" class="topbar-link" style="color: var(--color-accent); justify-content: center;">bballer4life e.V. ↗</a>
+        <h3 style="margin-bottom: 1rem; font-size: 1.35rem;">Kommende Spiele</h3>
+        {{ partial "teamsl-matches.html" (dict "limit" 4 "only_biba" true "filter" "upcoming" "title" "Kommende Spiele") }}
       </div>
     </div>
   </div>

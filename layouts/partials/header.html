@@ -1,20 +1,11 @@
 <!-- Topbar -->
 <div class="topbar">
-  <div class="container">
-    <div class="topbar-meta">
-      <span class="topbar-stammvereine">Spielgemeinschaft: <strong>TSV Bierden</strong> &bull; <strong>TSV Bassen</strong> &bull; <strong>TSV Achim</strong></span>
-    </div>
+  <div class="container" style="justify-content: flex-end;">
     <div class="topbar-links">
-      <a href="{{ site.Params.wiki }}" target="_blank" rel="noopener" class="topbar-link">
-        <span>📖 Wiki</span>
-      </a>
-      <a href="{{ site.Params.fanshop }}" target="_blank" rel="noopener" class="topbar-link">
-        <span>🛍️ Fanshop</span>
-      </a>
-      <a href="{{ site.Params.instagram }}" target="_blank" rel="noopener" class="topbar-link" title="Instagram">
+      <a href="{{ site.Params.instagram }}" target="_blank" rel="noopener noreferrer" class="topbar-link" title="Instagram">
         <span>📸 Instagram</span>
       </a>
-      <a href="{{ site.Params.whatsapp }}" target="_blank" rel="noopener" class="topbar-link" title="WhatsApp Channel">
+      <a href="{{ site.Params.whatsapp }}" target="_blank" rel="noopener noreferrer" class="topbar-link" title="WhatsApp Channel">
         <span>💬 WhatsApp</span>
       </a>
     </div>
@@ -40,14 +31,14 @@
       <ul class="nav-list">
         {{ range site.Menus.main }}
           <li>
-            <a href="{{ .URL }}" class="nav-link {{ if or ($.IsMenuCurrent "main" .) ($.HasMenuCurrent "main" .) }}active{{ end }}" {{ if strings.HasPrefix .URL "http" }}target="_blank" rel="noopener"{{ end }}>
+            <a href="{{ .URL }}" class="nav-link {{ if or ($.IsMenuCurrent "main" .) ($.HasMenuCurrent "main" .) (and (eq .URL "/teams/") (eq $.Section "teams")) (and (eq .URL "/mitglied-werden/") (strings.HasPrefix $.RelPermalink "/mitglied-werden")) }}active{{ end }}" {{ if strings.HasPrefix .URL "http" }}target="_blank" rel="noopener noreferrer"{{ end }}>
               {{ .Name }}
             </a>
           </li>
         {{ end }}
       </ul>
-      <a href="/spielbetrieb/" class="btn-nav-cta">
-        🏀 Spielplan
+      <a href="/kontakt/" class="btn-nav-cta">
+        ✉️ Kontakt
       </a>
     </nav>
   </div>

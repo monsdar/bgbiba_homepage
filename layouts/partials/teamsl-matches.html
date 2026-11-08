@@ -4,43 +4,59 @@
 */}}
 
 {{- $leagueId := .league_id -}}
+{{- $leagueIds := .league_ids -}}
 {{- $teamId := .team_id -}}
 {{- $limit := .limit | default 10 | int -}}
 {{- $onlyBiba := .only_biba | default false -}}
+{{- $filter := .filter | default "" -}}
+{{- $badgeTitle := .title | default "DBB Spielbetrieb" -}}
 {{- $apiBase := site.Params.slapi_url | default "https://slapi.up.railway.app" | strings.TrimRight "/" -}}
 {{- $token := os.Getenv "SLAPI_TOKEN" | default (os.Getenv "TEAMSL_API_TOKEN") -}}
+
+{{- $targetLeagues := slice -}}
+{{- if $leagueId -}}
+  {{- $targetLeagues = slice (printf "%v" $leagueId) -}}
+{{- else if $leagueIds -}}
+  {{- $targetLeagues = $leagueIds -}}
+{{- else if site.Params.active_leagues -}}
+  {{- $targetLeagues = site.Params.active_leagues -}}
+{{- end -}}
 
 {{- $matches := slice -}}
 {{- $isLive := false -}}
 {{- $errorMessage := "" -}}
+{{- $hasValidLeague := false -}}
 
-{{- $isRealLeague := false -}}
-{{- if and $leagueId (findRE "^[0-9]+$" (printf "%v" $leagueId)) -}}
-  {{- $isRealLeague = gt (int $leagueId) 999 -}}
+{{- range $targetLeagues -}}
+  {{- $lid := printf "%v" . -}}
+  {{- if and $lid (findRE "^[0-9]+$" $lid) (gt (int $lid) 999) -}}
+    {{- $hasValidLeague = true -}}
+    {{- if $token -}}
+      {{- $endpoint := printf "%s/leagues/%v/matches" $apiBase $lid -}}
+      {{- $headers := dict "Authorization" (printf "Bearer %s" $token) -}}
+      {{- $opts := dict "headers" $headers -}}
+      {{- $res := resources.GetRemote $endpoint $opts -}}
+      {{- if and $res (not $res.Err) -}}
+        {{- $json := $res | transform.Unmarshal -}}
+        {{- with $json.matches -}}
+          {{- $matches = $matches | append . -}}
+          {{- $isLive = true -}}
+        {{- else -}}
+          {{- $errorMessage = printf "Keine Spiele für Liga %v in TeamSL gefunden." $lid -}}
+        {{- end -}}
+      {{- else if $res.Err -}}
+        {{- $errorMessage = printf "Fehler beim API-Abruf (%s): %s" $endpoint $res.Err -}}
+      {{- end -}}
+    {{- end -}}
+  {{- end -}}
 {{- end -}}
 
 {{- if not $token -}}
   {{- $errorMessage = "Secret SLAPI_TOKEN fehlt in der Build-Umgebung" -}}
-{{- else if not $leagueId -}}
-  {{- $errorMessage = "Keine league_id im Shortcode angegeben" -}}
-{{- else if not $isRealLeague -}}
-  {{- $errorMessage = printf "Ungültige oder temporäre Liga-ID (%v). Eine offizielle DBB-Liga-ID muss 5-stellig sein." $leagueId -}}
-{{- else -}}
-  {{- $endpoint := printf "%s/leagues/%v/matches" $apiBase $leagueId -}}
-  {{- $headers := dict "Authorization" (printf "Bearer %s" $token) -}}
-  {{- $opts := dict "headers" $headers -}}
-  {{- $res := resources.GetRemote $endpoint $opts -}}
-  {{- if and $res (not $res.Err) -}}
-    {{- $json := $res | transform.Unmarshal -}}
-    {{- with $json.matches -}}
-      {{- $matches = . -}}
-      {{- $isLive = true -}}
-    {{- else -}}
-      {{- $errorMessage = printf "Keine Spiele für Liga %v in TeamSL gefunden." $leagueId -}}
-    {{- end -}}
-  {{- else if $res.Err -}}
-    {{- $errorMessage = printf "Fehler beim API-Abruf (%s): %s" $endpoint $res.Err -}}
-  {{- end -}}
+{{- else if eq (len $targetLeagues) 0 -}}
+  {{- $errorMessage = "Keine league_id angegeben" -}}
+{{- else if not $hasValidLeague -}}
+  {{- $errorMessage = printf "Ungültige oder temporäre Liga-ID (%v). Eine offizielle DBB-Liga-ID muss 5-stellig sein." (delimit $targetLeagues ", ") -}}
 {{- end -}}
 
 {{- $teamIdStr := "" -}}
@@ -51,7 +67,7 @@
 <div class="teamsl-matches-wrapper">
   <div class="matches-header">
     <div class="header-titles">
-      <span class="badge badge-primary">DBB Spielbetrieb</span>
+      <span class="badge badge-primary">{{ $badgeTitle }}</span>
       {{- if $isLive -}}
         <span class="badge badge-live">● Live Sync</span>
       {{- else -}}
@@ -60,10 +76,70 @@
     </div>
   </div>
 
-  {{- if and $isLive (gt (len $matches) 0) -}}
+  {{- if $isLive -}}
+    {{- $filteredMatches := slice -}}
+    {{- range $matches -}}
+      {{- $home := .home_team.name -}}
+      {{- $away := .away_team.name -}}
+      {{- $homeClubId := printf "%v" (or .home_team.club_id "") -}}
+      {{- $awayClubId := printf "%v" (or .away_team.club_id "") -}}
+      {{- $isBibaHome := or (in (lower $home) "biba") (in (lower $home) "bierden") (eq $homeClubId "4189") -}}
+      {{- $isBibaAway := or (in (lower $away) "biba") (in (lower $away) "bierden") (eq $awayClubId "4189") -}}
+
+      {{- $isTargetHome := false -}}
+      {{- $isTargetAway := false -}}
+      {{- if $teamIdStr -}}
+        {{- $homeId := printf "%v" (or .home_team.id "") -}}
+        {{- $homeSeasonId := printf "%v" (or .home_team.season_team_id "") -}}
+        {{- $homePermId := printf "%v" (or .home_team.team_permanent_id "") -}}
+        {{- if or (eq $homeId $teamIdStr) (eq $homeSeasonId $teamIdStr) (eq $homePermId $teamIdStr) -}}
+          {{- $isTargetHome = true -}}
+        {{- end -}}
+
+        {{- $awayId := printf "%v" (or .away_team.id "") -}}
+        {{- $awaySeasonId := printf "%v" (or .away_team.season_team_id "") -}}
+        {{- $awayPermId := printf "%v" (or .away_team.team_permanent_id "") -}}
+        {{- if or (eq $awayId $teamIdStr) (eq $awaySeasonId $teamIdStr) (eq $awayPermId $teamIdStr) -}}
+          {{- $isTargetAway = true -}}
+        {{- end -}}
+      {{- end -}}
+
+      {{- $include := true -}}
+      {{- if $teamIdStr -}}
+        {{- if not (or $isTargetHome $isTargetAway) -}}
+          {{- $include = false -}}
+        {{- end -}}
+      {{- else if $onlyBiba -}}
+        {{- if not (or $isBibaHome $isBibaAway) -}}
+          {{- $include = false -}}
+        {{- end -}}
+      {{- end -}}
+
+      {{- if eq $filter "finished" -}}
+        {{- if not .is_finished -}}
+          {{- $include = false -}}
+        {{- end -}}
+      {{- else if eq $filter "upcoming" -}}
+        {{- if .is_finished -}}
+          {{- $include = false -}}
+        {{- end -}}
+      {{- end -}}
+
+      {{- if $include -}}
+        {{- $filteredMatches = $filteredMatches | append . -}}
+      {{- end -}}
+    {{- end -}}
+
+    {{- if gt (len $filteredMatches) $limit -}}
+      {{- if eq $filter "finished" -}}
+        {{- $filteredMatches = last $limit $filteredMatches -}}
+      {{- else -}}
+        {{- $filteredMatches = first $limit $filteredMatches -}}
+      {{- end -}}
+    {{- end -}}
+
     <div class="matches-list">
-      {{- $count := 0 -}}
-      {{- range $matches -}}
+      {{- range $filteredMatches -}}
         {{- $home := .home_team.name -}}
         {{- $away := .away_team.name -}}
         {{- $homeClubId := printf "%v" (or .home_team.club_id "") -}}
@@ -89,74 +165,65 @@
           {{- end -}}
         {{- end -}}
 
-        {{- $include := true -}}
+        {{/* Datumsformatierung */}}
+        {{- $dt := time .datetime -}}
+        {{- $dateStr := $dt.Format "02.01.2006" -}}
+        {{- $timeStr := $dt.Format "15:04" -}}
+
+        {{- $cardIsBiba := or $isBibaHome $isBibaAway -}}
+        {{- $highlightHome := $isBibaHome -}}
+        {{- $highlightAway := $isBibaAway -}}
         {{- if $teamIdStr -}}
-          {{- if not (or $isTargetHome $isTargetAway) -}}
-            {{- $include = false -}}
-          {{- end -}}
-        {{- else if $onlyBiba -}}
-          {{- if not (or $isBibaHome $isBibaAway) -}}
-            {{- $include = false -}}
-          {{- end -}}
+          {{- $highlightHome = $isTargetHome -}}
+          {{- $highlightAway = $isTargetAway -}}
         {{- end -}}
 
-        {{- if and $include (lt $count $limit) -}}
-          {{- $count = add $count 1 -}}
-          
-          {{/* Datumsformatierung */}}
-          {{- $dt := time .datetime -}}
-          {{- $dateStr := $dt.Format "02.01.2006" -}}
-          {{- $timeStr := $dt.Format "15:04" -}}
+        <div class="match-card {{ if $cardIsBiba }}match-biba{{ end }}">
+          <div class="match-meta">
+            <span class="match-date">{{ $dateStr }}</span>
+            <span class="match-time">{{ $timeStr }} Uhr</span>
+            {{- with .location -}}
+              <span class="match-venue" title="{{ . }}">📍 {{ . }}</span>
+            {{- end -}}
+          </div>
 
-          {{- $cardIsBiba := or $isBibaHome $isBibaAway -}}
-          {{- $highlightHome := $isBibaHome -}}
-          {{- $highlightAway := $isBibaAway -}}
-          {{- if $teamIdStr -}}
-            {{- $highlightHome = $isTargetHome -}}
-            {{- $highlightAway = $isTargetAway -}}
-          {{- end -}}
-
-          <div class="match-card {{ if $cardIsBiba }}match-biba{{ end }}">
-            <div class="match-meta">
-              <span class="match-date">{{ $dateStr }}</span>
-              <span class="match-time">{{ $timeStr }} Uhr</span>
-              {{- with .location -}}
-                <span class="match-venue" title="{{ . }}">📍 {{ . }}</span>
+          <div class="match-teams-box">
+            <div class="team team-home {{ if $highlightHome }}is-biba{{ end }}">
+              <span class="team-name">{{ $home }}</span>
+              {{- if .is_finished -}}
+                <span class="team-score">{{ .score_home }}</span>
               {{- end -}}
             </div>
 
-            <div class="match-teams-box">
-              <div class="team team-home {{ if $highlightHome }}is-biba{{ end }}">
-                <span class="team-name">{{ $home }}</span>
-                {{- if .is_finished -}}
-                  <span class="team-score">{{ .score_home }}</span>
-                {{- end -}}
-              </div>
+            <div class="match-versus">
+              {{- if .is_finished -}}
+                <span class="badge badge-final">Endstand</span>
+              {{- else if .is_cancelled -}}
+                <span class="badge badge-cancelled">Abgesagt</span>
+              {{- else -}}
+                <span class="badge badge-vs">VS</span>
+              {{- end -}}
+            </div>
 
-              <div class="match-versus">
-                {{- if .is_finished -}}
-                  <span class="badge badge-final">Endstand</span>
-                {{- else if .is_cancelled -}}
-                  <span class="badge badge-cancelled">Abgesagt</span>
-                {{- else -}}
-                  <span class="badge badge-vs">VS</span>
-                {{- end -}}
-              </div>
-
-              <div class="team team-away {{ if $highlightAway }}is-biba{{ end }}">
-                <span class="team-name">{{ $away }}</span>
-                {{- if .is_finished -}}
-                  <span class="team-score">{{ .score_away }}</span>
-                {{- end -}}
-              </div>
+            <div class="team team-away {{ if $highlightAway }}is-biba{{ end }}">
+              <span class="team-name">{{ $away }}</span>
+              {{- if .is_finished -}}
+                <span class="team-score">{{ .score_away }}</span>
+              {{- end -}}
             </div>
           </div>
-        {{- end -}}
+        </div>
       {{- end -}}
 
-      {{- if eq $count 0 -}}
+      {{- if eq (len $filteredMatches) 0 -}}
         <div style="padding: 1.5rem; text-align: center;">
-          <p class="text-muted">Keine Spiele für die gewählten Kriterien (Team-ID: <code>{{ $teamIdStr }}</code>) in Liga <code>{{ $leagueId }}</code> gefunden.</p>
+          {{- if eq $filter "finished" -}}
+            <p class="text-muted">Aktuell liegen noch keine abgeschlossenen Spielergebnisse vor.</p>
+          {{- else if eq $filter "upcoming" -}}
+            <p class="text-muted">Aktuell sind keine kommenden Spiele angesetzt.</p>
+          {{- else -}}
+            <p class="text-muted">Keine Spiele für die gewählten Kriterien gefunden.</p>
+          {{- end -}}
         </div>
       {{- end -}}
     </div>
@@ -168,10 +235,10 @@
         <p class="api-fallback-desc">
           {{- if not $token -}}
             In der Build-Umgebung fehlt das Secret <code>SLAPI_TOKEN</code>. Ohne dieses Token können keine Live-Spiele von der TeamSL-Schnittstelle abgefragt werden.
-          {{- else if not $isRealLeague -}}
-            Für diese Ansicht ist noch keine gültige DBB-Liga-ID hinterlegt (angegeben: <code>{{ $leagueId | default "leer" }}</code>).
+          {{- else if not $hasValidLeague -}}
+            Für diese Ansicht ist noch keine gültige DBB-Liga-ID hinterlegt (angegeben: <code>{{ delimit $targetLeagues ", " | default "leer" }}</code>).
           {{- else -}}
-            Die Spieldaten für Liga <code>{{ $leagueId }}</code> konnten nicht von TeamSL bezogen werden ({{ $errorMessage }}).
+            Die Spieldaten für Liga <code>{{ delimit $targetLeagues ", " }}</code> konnten nicht von TeamSL bezogen werden ({{ $errorMessage }}).
           {{- end -}}
         </p>
         <div class="api-fallback-checklist">
@@ -179,10 +246,10 @@
           <ul>
             {{- if not $token -}}
               <li>Hinterlege das Secret <code>SLAPI_TOKEN</code> in deinen GitHub Actions Secrets (<em>Settings &rarr; Secrets and variables &rarr; Actions</em>).</li>
-            {{- else if not $isRealLeague -}}
+            {{- else if not $hasValidLeague -}}
               <li>Trage in der entsprechenden Markdown-Datei eine gültige 5-stellige DBB-Liga-ID ein (z. B. <code>league_id="54185"</code>).</li>
             {{- else -}}
-              <li>Prüfe, ob die Liga-ID <code>{{ $leagueId }}</code> im DBB-System aktiv ist und Spiele angesetzt sind.</li>
+              <li>Prüfe, ob die Liga-ID <code>{{ delimit $targetLeagues ", " }}</code> im DBB-System aktiv ist und Spiele angesetzt sind.</li>
             {{- end -}}
           </ul>
         </div>

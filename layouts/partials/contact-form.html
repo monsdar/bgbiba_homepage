@@ -1,0 +1,184 @@
+{{- $recipient := .recipient | default site.Params.contact_email | default "info@bgbiba.net" -}}
+{{- $defaultSubject := .subject | default "Anfrage über die BG BiBA Website" -}}
+{{- $heading := .heading | default "Schreib uns eine Nachricht" -}}
+{{- $formId := printf "contact-form-%s" ($recipient | urlize) -}}
+
+<div class="contact-card">
+  <div class="contact-card-header">
+    <div>
+      <h3 class="contact-card-title">{{ $heading }}</h3>
+      <p class="contact-card-subtitle">
+        Direkter Kontakt per E-Mail an <a href="mailto:{{ $recipient }}" class="contact-email-link"><strong>{{ $recipient }}</strong></a>
+      </p>
+    </div>
+    <a href="mailto:{{ $recipient }}?subject={{ $defaultSubject | urlquery }}" class="btn btn-outline btn-sm">
+      ✉️ Direkt im E-Mail-Programm öffnen
+    </a>
+  </div>
+
+  <form id="{{ $formId }}" class="biba-contact-form" action="mailto:{{ $recipient }}" method="POST" data-recipient="{{ $recipient }}" novalidate>
+    <fieldset class="contact-fieldset">
+      <legend class="visually-hidden">{{ $heading }} ({{ $recipient }})</legend>
+
+      <div class="form-row-grid">
+        <div class="form-group">
+          <label for="{{ $formId }}-name" class="form-label">Dein Name <span class="required-marker" aria-hidden="true">*</span></label>
+          <input
+            type="text"
+            id="{{ $formId }}-name"
+            name="name"
+            class="form-control"
+            autocomplete="name"
+            enterkeyhint="next"
+            required
+            aria-describedby="{{ $formId }}-name-error"
+          >
+          <span id="{{ $formId }}-name-error" class="field-error" aria-live="polite"></span>
+        </div>
+
+        <div class="form-group">
+          <label for="{{ $formId }}-email" class="form-label">Deine E-Mail-Adresse <span class="required-marker" aria-hidden="true">*</span></label>
+          <input
+            type="email"
+            id="{{ $formId }}-email"
+            name="email"
+            class="form-control"
+            autocomplete="email"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            inputmode="email"
+            enterkeyhint="next"
+            required
+            aria-describedby="{{ $formId }}-email-error"
+          >
+          <span id="{{ $formId }}-email-error" class="field-error" aria-live="polite"></span>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ $formId }}-subject" class="form-label">Betreff <span class="required-marker" aria-hidden="true">*</span></label>
+        <input
+          type="text"
+          id="{{ $formId }}-subject"
+          name="subject"
+          class="form-control"
+          value="{{ $defaultSubject }}"
+          enterkeyhint="next"
+          required
+          aria-describedby="{{ $formId }}-subject-error"
+        >
+        <span id="{{ $formId }}-subject-error" class="field-error" aria-live="polite"></span>
+      </div>
+
+      <div class="form-group">
+        <label for="{{ $formId }}-message" class="form-label">Deine Nachricht <span class="required-marker" aria-hidden="true">*</span></label>
+        <textarea
+          id="{{ $formId }}-message"
+          name="message"
+          class="form-control"
+          rows="5"
+          required
+          aria-describedby="{{ $formId }}-message-hint {{ $formId }}-message-error"
+        ></textarea>
+        <span id="{{ $formId }}-message-hint" class="field-hint">Zum Beispiel Fragen zum Verein, Probetraining oder Spielbetrieb.</span>
+        <span id="{{ $formId }}-message-error" class="field-error" aria-live="polite"></span>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary contact-submit-btn">
+          ✉️ E-Mail an {{ $recipient }} vorbereiten &amp; senden
+        </button>
+      </div>
+
+      <div id="{{ $formId }}-status" class="form-status-box" aria-live="polite" hidden></div>
+    </fieldset>
+  </form>
+</div>
+
+<script>
+(function() {
+  const form = document.getElementById('{{ $formId }}');
+  if (!form) return;
+
+  const controls = form.querySelectorAll('.form-control');
+  const statusBox = document.getElementById('{{ $formId }}-status');
+  const submitBtn = form.querySelector('.contact-submit-btn');
+
+  function getErrorMessage(input) {
+    if (input.validity.valueMissing) {
+      return 'Bitte fülle dieses Pflichtfeld aus.';
+    }
+    if (input.validity.typeMismatch && input.type === 'email') {
+      return 'Bitte gib eine gültige E-Mail-Adresse ein (z. B. name@beispiel.de).';
+    }
+    return '';
+  }
+
+  controls.forEach((input) => {
+    const errorEl = document.getElementById(input.id + '-error');
+
+    input.addEventListener('blur', () => {
+      const msg = getErrorMessage(input);
+      input.setCustomValidity(msg);
+      if (errorEl) errorEl.textContent = msg;
+    });
+
+    input.addEventListener('input', () => {
+      input.setCustomValidity('');
+      if (errorEl) errorEl.textContent = '';
+    });
+  });
+
+  form.addEventListener('submit', (e) => {
+    e.preventDefault();
+
+    let firstInvalid = null;
+    controls.forEach((input) => {
+      const msg = getErrorMessage(input);
+      input.setCustomValidity(msg);
+      const errorEl = document.getElementById(input.id + '-error');
+      if (errorEl) errorEl.textContent = msg;
+      if (msg && !firstInvalid) {
+        firstInvalid = input;
+      }
+    });
+
+    if (firstInvalid) {
+      firstInvalid.focus();
+      return;
+    }
+
+    const recipient = form.dataset.recipient;
+    const name = form.elements['name'].value.trim();
+    const email = form.elements['email'].value.trim();
+    const subject = form.elements['subject'].value.trim();
+    const message = form.elements['message'].value.trim();
+
+    const bodyLines = [
+      message,
+      '',
+      '---',
+      'Name: ' + name,
+      'Antwort an: ' + email
+    ];
+
+    const mailtoUrl = 'mailto:' + encodeURIComponent(recipient) +
+      '?subject=' + encodeURIComponent(subject) +
+      '&body=' + encodeURIComponent(bodyLines.join('\r\n'));
+
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      setTimeout(() => { submitBtn.disabled = false; }, 2000);
+    }
+
+    window.location.href = mailtoUrl;
+
+    if (statusBox) {
+      statusBox.hidden = false;
+      statusBox.textContent = 'Dein E-Mail-Programm wurde mit deiner Nachricht an ' + recipient + ' geöffnet. Falls sich kein Programm geöffnet hat, sende deine Nachricht bitte direkt an ' + recipient + '.';
+    }
+  });
+})();
+</script>
+

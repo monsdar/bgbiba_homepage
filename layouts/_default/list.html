@@ -26,8 +26,13 @@
         <p class="card-text">
           {{ with .Description }}{{ . }}{{ else }}{{ .Summary | truncate 120 }}{{ end }}
         </p>
+        {{ with .Params.email }}
+          <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">
+            ✉️ <a href="mailto:{{ . }}">{{ . }}</a>
+          </p>
+        {{ end }}
         <div class="card-footer">
-          <a href="{{ .RelPermalink }}" class="btn btn-outline" style="width: 100%;">Zur Seite &rarr;</a>
+          <a href="{{ .RelPermalink }}" class="btn btn-outline" style="width: 100%;">Zur Teamseite &rarr;</a>
         </div>
       </div>
     {{ end }}

@@ -17,9 +17,10 @@ timeout = '60s'
 
 
 [params]
-  description = 'Offizielle Website der BG BiBA – Basketballgemeinschaft Bierden-Bassen-Achim (TSV Bierden, TSV Bassen, TSV Achim). News, Teams, Spielpläne, Tabellen und Vereinsleben.'
+  description = 'Offizielle Website der BG BiBA – Basketballgemeinschaft Bierden-Bassen-Achim. Basketball für Kinder, Jugendliche und Erwachsene in der Region Achim.'
   club_name = 'BG Bierden-Bassen-Achim'
   short_name = 'BG BiBA'
+  contact_email = 'info@bgbiba.net'
   logo = '/images/bgbiba_full_small.png'
   logo_dark = '/images/bgbiba_full_black_white.png'
   logo_tiny = '/images/bgbiba_full_tiny.png'
@@ -28,6 +29,7 @@ timeout = '60s'
   bookstack_url = 'https://wiki.bgbiba.de'
   slapi_url = 'https://slapi.up.railway.app'
   verband_id = 7
+  active_leagues = ['54185']
   
   # Social Media & Externe Links
   instagram = 'https://www.instagram.com/bgbiba/'
@@ -37,7 +39,7 @@ timeout = '60s'
   wiki = 'https://wiki.bgbiba.de/'
   foerderverein = 'https://www.bgbiba.info/bballer4life/'
 
-  # Stammvereine
+  # Stammvereine (nur im Footer verlinkt)
   stammvereine = [
     { name = 'TSV Bierden', url = 'https://tsv-bierden.de' },
     { name = 'TSV Bassen', url = 'https://tsv-bassen.de' },
@@ -56,26 +58,21 @@ timeout = '60s'
   weight = 20
 
 [[menu.main]]
-  name = 'Spielbetrieb'
-  url = '/spielbetrieb/'
+  name = 'Mitglied werden'
+  url = '/mitglied-werden/'
   weight = 30
 
 [[menu.main]]
-  name = 'Verein'
-  url = '/verein/'
+  name = 'Wiki ↗'
+  url = 'https://wiki.bgbiba.de/'
   weight = 40
 
 [[menu.main]]
-  name = 'Hallen'
-  url = '/hallen/'
+  name = 'Förderverein ↗'
+  url = 'https://www.bgbiba.info/bballer4life/'
   weight = 50
-
-[[menu.main]]
-  name = 'Wiki'
-  url = 'https://wiki.bgbiba.de/'
-  weight = 60
 
 [[menu.main]]
   name = 'Fanshop ↗'
   url = 'https://bgbiba.fan12.de/'
-  weight = 70
+  weight = 60

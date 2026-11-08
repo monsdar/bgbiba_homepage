@@ -2,4 +2,6 @@
 {{- $teamId := .Get "team_id" -}}
 {{- $limit := .Get "limit" | default 10 | int -}}
 {{- $onlyBiba := .Get "only_biba" | default false -}}
-{{ partial "teamsl-matches.html" (dict "league_id" $leagueId "team_id" $teamId "limit" $limit "only_biba" $onlyBiba) }}
+{{- $filter := .Get "filter" | default "" -}}
+{{- $title := .Get "title" | default "DBB Spielbetrieb" -}}
+{{ partial "teamsl-matches.html" (dict "league_id" $leagueId "team_id" $teamId "limit" $limit "only_biba" $onlyBiba "filter" $filter "title" $title) }}
