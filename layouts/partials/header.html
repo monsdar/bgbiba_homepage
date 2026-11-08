@@ -31,7 +31,7 @@
       <ul class="nav-list">
         {{ range site.Menus.main }}
           <li>
-            <a href="{{ strings.TrimPrefix "/" .URL | relURL }}" class="nav-link {{ if or ($.IsMenuCurrent "main" .) ($.HasMenuCurrent "main" .) (and (eq .URL "/teams/") (eq $.Section "teams")) (and (eq .URL "/mitglied-werden/") (strings.HasPrefix $.RelPermalink ("mitglied-werden" | relURL))) }}active{{ end }}" {{ if strings.HasPrefix .URL "http" }}target="_blank" rel="noopener noreferrer"{{ end }}>
+            <a href="{{ .URL }}" class="nav-link {{ if or ($.IsMenuCurrent "main" .) ($.HasMenuCurrent "main" .) (and (eq .URL ("teams/" | relURL)) (eq $.Section "teams")) (and (eq .URL ("mitglied-werden/" | relURL)) (strings.HasPrefix $.RelPermalink ("mitglied-werden" | relURL))) }}active{{ end }}" {{ if strings.HasPrefix .URL "http" }}target="_blank" rel="noopener noreferrer"{{ end }}>
               {{ .Name }}
             </a>
           </li>
