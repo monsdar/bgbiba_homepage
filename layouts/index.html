@@ -1,7 +1,7 @@
 {{ define "main" }}
 
 <!-- Hero Section: Wer wir sind & was wir machen -->
-<section class="hero">
+<section class="hero theme-dark" data-theme="dark">
   <div class="container hero-grid">
     <div class="hero-content">
       <div class="hero-badge">🏀 BG BiBA Basketball</div>
@@ -65,11 +65,11 @@
 
     <div class="matches-overview-grid">
       <div>
-        <h3 style="margin-bottom: 1rem; font-size: 1.35rem;">Letzte Ergebnisse</h3>
+        <h3 class="matches-col-heading">Letzte Ergebnisse</h3>
         {{ partial "teamsl-matches.html" (dict "limit" 4 "only_biba" true "filter" "finished" "title" "Letzte Ergebnisse") }}
       </div>
       <div>
-        <h3 style="margin-bottom: 1rem; font-size: 1.35rem;">Kommende Spiele</h3>
+        <h3 class="matches-col-heading">Kommende Spiele</h3>
         {{ partial "teamsl-matches.html" (dict "limit" 4 "only_biba" true "filter" "upcoming" "title" "Kommende Spiele") }}
       </div>
     </div>

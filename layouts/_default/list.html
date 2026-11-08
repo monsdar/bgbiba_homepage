@@ -1,6 +1,6 @@
 {{ define "main" }}
 <div class="container section">
-  <header class="section-header" style="margin-bottom: 2.5rem;">
+  <header class="section-header">
     <div>
       <h1 class="section-title">{{ .Title }}</h1>
       {{ with .Description }}
@@ -10,7 +10,7 @@
   </header>
 
   {{ with .Content }}
-    <div class="section-intro" style="margin-bottom: 2.5rem; font-size: 1.1rem; line-height: 1.7; max-width: 800px;">
+    <div class="section-intro">
       {{ . }}
     </div>
   {{ end }}
@@ -27,12 +27,12 @@
           {{ with .Description }}{{ . }}{{ else }}{{ .Summary | truncate 120 }}{{ end }}
         </p>
         {{ with .Params.email }}
-          <p style="font-size: 0.9rem; margin-bottom: 0.5rem;">
+          <p class="card-meta-email">
             ✉️ <a href="mailto:{{ . }}">{{ . }}</a>
           </p>
         {{ end }}
         <div class="card-footer">
-          <a href="{{ .RelPermalink }}" class="btn btn-outline" style="width: 100%;">Zur Teamseite &rarr;</a>
+          <a href="{{ .RelPermalink }}" class="btn btn-outline btn-block">Zur Teamseite &rarr;</a>
         </div>
       </div>
     {{ end }}

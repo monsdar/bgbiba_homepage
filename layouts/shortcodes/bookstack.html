@@ -42,11 +42,11 @@
         </p>
         {{- if .Inner -}}
           <div class="bookstack-inner-fallback">
-            <strong style="display: block; font-size: 0.85rem; color: #78350f; margin-bottom: 0.5rem;">📄 Angezeigter redaktioneller Ausweichinhalt:</strong>
+            <strong class="bookstack-fallback-label">📄 Angezeigter redaktioneller Ausweichinhalt:</strong>
             {{ .Inner | markdownify }}
           </div>
         {{- end -}}
-        <div class="api-fallback-actions" style="margin-top: 1rem;">
+        <div class="api-fallback-actions api-fallback-actions-spaced">
           <a href="{{ $wikiBase }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
             📖 BG BiBA Vereins-Wiki öffnen ↗
           </a>
@@ -75,11 +75,11 @@
       </div>
       {{- if .Inner -}}
         <div class="bookstack-inner-fallback">
-          <strong style="display: block; font-size: 0.85rem; color: #78350f; margin-bottom: 0.5rem;">📄 Angezeigter redaktioneller Ausweichinhalt:</strong>
+          <strong class="bookstack-fallback-label">📄 Angezeigter redaktioneller Ausweichinhalt:</strong>
           {{ .Inner | markdownify }}
         </div>
       {{- end -}}
-      <div class="api-fallback-actions" style="margin-top: 1rem;">
+      <div class="api-fallback-actions api-fallback-actions-spaced">
         <a href="{{ $wikiBase }}" target="_blank" rel="noopener noreferrer" class="btn btn-outline btn-sm">
           📖 Seite im Vereins-Wiki aufrufen ↗
         </a>

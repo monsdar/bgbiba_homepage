@@ -18,12 +18,14 @@ timeout = '60s'
 
 [params]
   description = 'Offizielle Website der BG BiBA – Basketballgemeinschaft Bierden-Bassen-Achim. Basketball für Kinder, Jugendliche und Erwachsene in der Region Achim.'
-  club_name = 'BG Bierden-Bassen-Achim'
+  club_name = 'Basketballgemeinschaft Bierden-Bassen-Achim'
   short_name = 'BG BiBA'
   contact_email = 'info@bgbiba.net'
   logo = '/images/bgbiba_full_small.png'
   logo_dark = '/images/bgbiba_full_black_white.png'
   logo_tiny = '/images/bgbiba_full_tiny.png'
+  logo_svg = '/images/bgbiba_full.svg'
+  logo_dark_svg = '/images/bgbiba_full_black_white.svg'
   
   # Externe URLs & Services
   bookstack_url = 'https://wiki.bgbiba.de'
@@ -41,9 +43,9 @@ timeout = '60s'
 
   # Stammvereine (nur im Footer verlinkt)
   stammvereine = [
-    { name = 'TSV Bierden', url = 'https://tsv-bierden.de' },
-    { name = 'TSV Bassen', url = 'https://tsv-bassen.de' },
-    { name = 'TSV Achim', url = 'https://tsv-achim.de' }
+    { name = 'TSV Bierden von 1928 e.V.', url = 'https://tsv-bierden.de' },
+    { name = 'TSV Bassen e.V.', url = 'https://tsv-bassen.de' },
+    { name = 'TSV Achim 1860 e.V.', url = 'https://tsv-achim.de' }
   ]
 
 # Navigation

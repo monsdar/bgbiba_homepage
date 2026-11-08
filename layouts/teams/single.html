@@ -2,13 +2,13 @@
 {{- $teamEmail := .Params.email | default site.Params.contact_email | default "info@bgbiba.net" -}}
 <div class="container section">
   <article class="page-article">
-    <header class="page-header" style="margin-bottom: 2rem; border-bottom: 1px solid var(--border-color); padding-bottom: 1.5rem;">
-      <div style="font-size: 0.85rem; color: var(--color-accent); font-weight: 700; text-transform: uppercase; margin-bottom: 0.5rem;">
+    <header class="page-header">
+      <div class="page-eyebrow">
         {{ with .Params.category }}{{ . }}{{ else }}BG BiBA Team{{ end }}
       </div>
-      <h1 class="page-title" style="font-size: 2.5rem; margin-bottom: 0.5rem;">{{ with .Params.icon }}{{ . }} {{ end }}{{ .Title }}</h1>
+      <h1 class="page-title">{{ with .Params.icon }}{{ . }} {{ end }}{{ .Title }}</h1>
       {{ with .Description }}
-        <p class="page-description text-muted" style="font-size: 1.15rem; margin-bottom: 1.25rem;">{{ . }}</p>
+        <p class="page-description text-muted">{{ . }}</p>
       {{ end }}
 
       <!-- Quick Contact Banner for the Team -->
@@ -24,15 +24,15 @@
       </div>
     </header>
 
-    <div class="page-content" style="font-size: 1.05rem; line-height: 1.75;">
+    <div class="page-content">
       {{ .Content }}
     </div>
 
-    <hr style="margin: 3rem 0; border: none; border-top: 1px solid var(--border-color);">
+    <hr class="section-divider">
 
     <section id="team-kontakt" aria-labelledby="team-kontakt-heading">
-      <h2 id="team-kontakt-heading" style="margin-bottom: 1rem;">Kontakt zum Team aufnehmen</h2>
-      <p class="text-muted" style="margin-bottom: 1.5rem;">
+      <h2 id="team-kontakt-heading" class="team-contact-heading">Kontakt zum Team aufnehmen</h2>
+      <p class="text-muted team-contact-lead">
         Egal ob du neu einsteigen möchtest, ein Probetraining suchst oder eine Frage an die Trainerinnen und Trainer hast – schreib uns einfach!
       </p>
       {{ partial "contact-form.html" (dict "recipient" $teamEmail "subject" (printf "Anfrage / Probetraining – %s" .Title) "heading" (printf "Nachricht an %s senden" .Title)) }}

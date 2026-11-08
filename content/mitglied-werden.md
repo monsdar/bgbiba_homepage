@@ -21,7 +21,7 @@ Bei allgemeinen Fragen zur Mitgliedschaft erreichst du uns jederzeit über unser
 
 ---
 
-<div style="display: flex; gap: 1rem; flex-wrap: wrap; margin-top: 1.5rem;">
+<div class="cta-button-group">
   <a href="/teams/" class="btn btn-primary">🏀 Passendes Team finden</a>
   <a href="/kontakt/" class="btn btn-outline">✉️ Frage zur Mitgliedschaft stellen</a>
 </div>
