@@ -1570,6 +1570,27 @@
     overflow: hidden;
   }
 
+  .instagram-card-caption p {
+    margin-bottom: 0.25rem;
+  }
+
+  .instagram-card-caption p:last-child {
+    margin-bottom: 0;
+  }
+
+  .instagram-card-caption :is(h1, h2, h3, h4, h5, h6) {
+    font-family: inherit;
+    font-size: inherit;
+    font-weight: 700;
+    margin-bottom: 0.25rem;
+  }
+
+  .instagram-card-caption strong,
+  .modal-caption-content strong {
+    font-weight: 700;
+    color: var(--biba-black);
+  }
+
   .instagram-card-cta {
     display: flex;
     justify-content: flex-end;
@@ -1742,6 +1763,26 @@
     overflow-y: auto;
     padding-inline-end: 0.5rem;
     margin-bottom: 1.5rem;
+  }
+
+  .modal-caption-content p {
+    margin-bottom: 0.85rem;
+  }
+
+  .modal-caption-content p:last-child {
+    margin-bottom: 0;
+  }
+
+  .modal-caption-content :is(ul, ol) {
+    padding-inline-start: 1.25rem;
+    margin-bottom: 0.85rem;
+  }
+
+  .modal-caption-content :is(h1, h2, h3, h4, h5, h6) {
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
   }
 
   .modal-actions-footer {

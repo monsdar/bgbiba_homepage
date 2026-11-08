@@ -45,20 +45,6 @@
 
 <div class="instagram-news-wrapper">
   <div class="instagram-feed-header">
-    <div class="feed-header-left">
-      <span class="badge badge-primary">📸 Instagram Feed</span>
-      {{- if $isLive -}}
-        <span class="badge badge-live">● Live Sync</span>
-      {{- else -}}
-        <span class="badge badge-error">⚠️ Sync fehlgeschlagen</span>
-      {{- end -}}
-    </div>
-    <div class="feed-header-right">
-      <a href="https://www.instagram.com/bgbiba/" target="_blank" rel="noopener noreferrer" class="instagram-channel-link">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line></svg>
-        <span>@bgbiba folgen</span>
-      </a>
-    </div>
   </div>
 
   {{- if and $isLive (gt (len $posts) 0) -}}
@@ -67,6 +53,7 @@
         {{- $mediaUrl := $post.media_url -}}
         {{- $thumbUrl := $post.thumbnail_url | default $mediaUrl -}}
         {{- $caption := $post.caption | default "" -}}
+        {{- $formattedCaption := $caption | markdownify | replaceRE "</p>\\s+" "</p>" | safeHTML -}}
         {{- $type := $post.media_type | default "IMAGE" -}}
         {{- $permalink := $post.permalink | default "https://www.instagram.com/bgbiba/" -}}
         {{- $date := "" -}}
@@ -89,36 +76,22 @@
           
           <div class="instagram-card-media">
             <img src="{{ $thumbUrl }}" alt="BG BiBA Instagram News Post" loading="lazy" />
-            <div class="media-type-badge">
-              {{- if eq $type "VIDEO" -}}
-                <span title="Video / Reel">🎬 Reel</span>
-              {{- else if eq $type "CAROUSEL_ALBUM" -}}
-                <span title="Bilder-Galerie">📑 Galerie</span>
-              {{- else -}}
-                <span title="Foto">📷 Foto</span>
-              {{- end -}}
-            </div>
-            {{- if eq $type "VIDEO" -}}
-              <div class="video-play-overlay" aria-hidden="true">
-                <svg width="32" height="32" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-              </div>
-            {{- end -}}
           </div>
 
           <div class="instagram-card-body">
             <div class="instagram-card-meta">
               <span class="post-date">📅 {{ $date }}</span>
             </div>
-            <p class="instagram-card-caption">
-              {{- $caption | truncate 130 " …" -}}
-            </p>
+            <div class="instagram-card-caption">
+              {{- $formattedCaption | truncate 130 " …" -}}
+            </div>
             <div class="instagram-card-cta">
               <span class="cta-link">Mehr lesen &rarr;</span>
             </div>
           </div>
 
           {{/* Versteckter Volltext für das Modal */}}
-          <template class="post-full-caption">{{ $caption }}</template>
+          <template class="post-full-caption">{{ $formattedCaption }}</template>
         </article>
       {{- end -}}
     </div>
@@ -244,7 +217,6 @@
         const date = card.dataset.date;
         
         const template = card.querySelector('.post-full-caption');
-        const fullCaption = template ? template.innerHTML : '';
 
         // Media einsetzen
         mediaContainer.innerHTML = '';
@@ -265,9 +237,11 @@
           mediaContainer.appendChild(img);
         }
 
-        // Metadaten & Text einsetzen
+        // Metadaten & formatierten Text aus <template> einsetzen
         if (dateDisplay) dateDisplay.textContent = date ? `Veröffentlicht am ${date}` : '';
-        if (captionText) captionText.textContent = fullCaption;
+        if (captionText) {
+          captionText.replaceChildren(template ? template.content.cloneNode(true) : '');
+        }
         if (igLink && permalink) igLink.href = permalink;
 
         // Modal öffnen
