@@ -1,5 +1,8 @@
 {{ define "main" }}
 {{- $teamEmail := .Params.email | default site.Params.contact_email | default "info@bgbiba.net" -}}
+{{- $isOpen := ne .Params.is_open_for_new_players false -}}
+{{- $contactSubject := cond $isOpen (printf "Anfrage / Probetraining – %s" .Title) (printf "Anfrage / Warteliste – %s" .Title) -}}
+{{- $contactHint := cond $isOpen "Zum Beispiel Fragen zum Verein, Probetraining oder Spielbetrieb." "Zum Beispiel Aufnahme auf die Warteliste oder Fragen an das Trainerteam." -}}
 <div class="container section">
   <article class="page-article">
     <header class="page-header">
@@ -14,12 +17,16 @@
       <!-- Quick Contact Banner for the Team -->
       <div class="team-contact-banner">
         <div class="team-contact-banner-info">
-          <strong>Interesse an einem Probetraining oder Fragen zum Team?</strong>
+          {{ if $isOpen }}
+            <strong>Interesse an einem Probetraining oder Fragen zum Team?</strong>
+          {{ else }}
+            <strong>Fragen zum Team oder Interesse an einem Platz auf der Warteliste?</strong>
+          {{ end }}
           <span>Du erreichst uns direkt unter <a href="mailto:{{ $teamEmail }}">{{ $teamEmail }}</a></span>
         </div>
         <div class="team-contact-banner-actions">
           <a href="#team-kontakt" class="btn btn-primary btn-sm">✉️ Nachricht schreiben</a>
-          <a href="mailto:{{ $teamEmail }}?subject={{ printf "Anfrage / Probetraining – %s" .Title | urlquery }}" class="btn btn-outline btn-sm">Direkt per E-Mail</a>
+          <a href="mailto:{{ $teamEmail }}?subject={{ $contactSubject | urlquery }}" class="btn btn-outline btn-sm">Direkt per E-Mail</a>
         </div>
       </div>
     </header>
@@ -33,9 +40,13 @@
     <section id="team-kontakt" aria-labelledby="team-kontakt-heading">
       <h2 id="team-kontakt-heading" class="team-contact-heading">Kontakt zum Team aufnehmen</h2>
       <p class="text-muted team-contact-lead">
-        Egal ob du neu einsteigen möchtest, ein Probetraining suchst oder eine Frage an die Trainerinnen und Trainer hast – schreib uns einfach!
+        {{ if $isOpen }}
+          Egal ob du neu einsteigen möchtest, ein Probetraining suchst oder eine Frage an die Trainerinnen und Trainer hast – schreib uns einfach!
+        {{ else }}
+          Aktuell sind in diesem Team leider keine freien Plätze verfügbar. Du kannst dich aber gerne für unsere Warteliste vormerken lassen oder uns bei Fragen an die Trainerinnen und Trainer schreiben!
+        {{ end }}
       </p>
-      {{ partial "contact-form.html" (dict "recipient" $teamEmail "subject" (printf "Anfrage / Probetraining – %s" .Title) "heading" (printf "Nachricht an %s senden" .Title)) }}
+      {{ partial "contact-form.html" (dict "recipient" $teamEmail "subject" $contactSubject "heading" (printf "Nachricht an %s senden" .Title) "hint" $contactHint) }}
     </section>
   </article>
 </div>

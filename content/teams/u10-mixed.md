@@ -5,6 +5,7 @@ category: "Minis"
 icon: "👫"
 email: "u10@bgbiba.net"
 weight: 10
+is_open_for_new_players: false
 ---
 
 ## Über das Team

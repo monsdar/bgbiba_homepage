@@ -1,6 +1,7 @@
 {{- $recipient := .recipient | default site.Params.contact_email | default "info@bgbiba.net" -}}
 {{- $defaultSubject := .subject | default "Anfrage über die BG BiBA Website" -}}
 {{- $heading := .heading | default "Schreib uns eine Nachricht" -}}
+{{- $hint := .hint | default "Zum Beispiel Fragen zum Verein, Probetraining oder Spielbetrieb." -}}
 {{- $formId := printf "contact-form-%s" ($recipient | urlize) -}}
 
 <div class="contact-card">
@@ -81,7 +82,7 @@
           required
           aria-describedby="{{ $formId }}-message-hint {{ $formId }}-message-error"
         ></textarea>
-        <span id="{{ $formId }}-message-hint" class="field-hint">Zum Beispiel Fragen zum Verein, Probetraining oder Spielbetrieb.</span>
+        <span id="{{ $formId }}-message-hint" class="field-hint">{{ $hint }}</span>
         <span id="{{ $formId }}-message-error" class="field-error" aria-live="polite"></span>
       </div>
 
