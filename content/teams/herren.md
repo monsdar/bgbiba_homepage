@@ -1,18 +1,24 @@
 ---
 title: "Herren"
-description: "Erwachsenen-Basketball im Ligabetrieb des DBB Niedersachsen / Bremen."
+description: "Ambitionierter Erwachsenen-Basketball auf höherem Niveau im regulären Ligaspielbetrieb."
 category: "Senioren"
 icon: "🔥"
 email: "herren@bgbiba.net"
-weight: 10
+weight: 70
 ---
 
-{{< bookstack id="20" >}}
-### Über das Team & Trainingszeiten
-Die Herrenmannschaft der BG BiBA tritt im regulären Ligabetrieb an. Neue Mitspieler mit Basketball-Erfahrung oder motivierte Wiedereinsteiger sind jederzeit willkommen!
+## Über das Team
 
-* **Dienstag:** 19:30 – 21:30 Uhr | Waldsporthalle Achim
-* **Freitag:** 20:00 – 22:00 Uhr | Gymnasium Achim
+* **Altersklasse:** Erwachsene ab Jahrgang 2008
+* **Spielklasse:** Regionsliga Süd Herren
+
+Unsere **Herrenmannschaft** tritt im regulären Ligaspielbetrieb auf **höherem sportlichen Niveau** an. Intensives Training, Teamtaktik und der leistungsorientierte Wettkampf in der Liga stehen hier im Mittelpunkt. Erfahrene Basketballer, die eine sportliche Herausforderung suchen, sind jederzeit zu einem Probetraining willkommen!
+
+---
+
+## Trainingszeiten & Infos
+
+{{< bookstack id="83" >}}
 * **Kontakt:** [herren@bgbiba.net](mailto:herren@bgbiba.net)
 {{< /bookstack >}}
 
@@ -20,10 +26,10 @@ Die Herrenmannschaft der BG BiBA tritt im regulären Ligabetrieb an. Neue Mitspi
 
 ## Spiele & Ergebnisse
 
-{{< teamsl-matches league_id="101" limit="6" only_biba="true" >}}
+{{< teamsl-matches league_id="54166" team_id="448402" limit="6" >}}
 
 ---
 
 ## Tabelle
 
-{{< teamsl-standings league_id="101" >}}
+{{< teamsl-standings league_id="54166" >}}

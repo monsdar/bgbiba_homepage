@@ -38,8 +38,14 @@
       {{- $res := resources.GetRemote $endpoint $opts -}}
       {{- if and $res (not $res.Err) -}}
         {{- $json := $res | transform.Unmarshal -}}
+        {{- $leagueLabel := "" -}}
+        {{- with site.Params.league_labels -}}
+          {{- $leagueLabel = index . $lid | default "" -}}
+        {{- end -}}
         {{- with $json.matches -}}
-          {{- $matches = $matches | append . -}}
+          {{- range . -}}
+            {{- $matches = $matches | append (merge . (dict "_league_id" $lid "_league_label" $leagueLabel)) -}}
+          {{- end -}}
           {{- $isLive = true -}}
         {{- else -}}
           {{- $errorMessage = printf "Keine Spiele für Liga %v in TeamSL gefunden." $lid -}}
@@ -120,7 +126,7 @@
           {{- $include = false -}}
         {{- end -}}
       {{- else if eq $filter "upcoming" -}}
-        {{- if .is_finished -}}
+        {{- if or .is_finished .is_cancelled -}}
           {{- $include = false -}}
         {{- end -}}
       {{- end -}}
@@ -130,12 +136,20 @@
       {{- end -}}
     {{- end -}}
 
+    {{- if gt (len $filteredMatches) 1 -}}
+      {{- $filteredMatches = sort $filteredMatches "datetime" "asc" -}}
+    {{- end -}}
+
     {{- if gt (len $filteredMatches) $limit -}}
       {{- if eq $filter "finished" -}}
         {{- $filteredMatches = last $limit $filteredMatches -}}
       {{- else -}}
         {{- $filteredMatches = first $limit $filteredMatches -}}
       {{- end -}}
+    {{- end -}}
+
+    {{- if and (eq $filter "finished") (gt (len $filteredMatches) 1) -}}
+      {{- $filteredMatches = sort $filteredMatches "datetime" "desc" -}}
     {{- end -}}
 
     <div class="matches-list">
@@ -180,6 +194,9 @@
 
         <div class="match-card {{ if $cardIsBiba }}match-biba{{ end }}">
           <div class="match-meta">
+            {{- if and (gt (len $targetLeagues) 1) ._league_label -}}
+              <span class="badge badge-small-biba">{{ ._league_label }}</span>
+            {{- end -}}
             <span class="match-date">{{ $dateStr }}</span>
             <span class="match-time">{{ $timeStr }} Uhr</span>
             {{- with .location -}}

@@ -31,7 +31,30 @@ timeout = '60s'
   bookstack_url = 'https://wiki.bgbiba.de'
   slapi_url = 'https://slapi.up.railway.app'
   verband_id = 7
-  active_leagues = ['54185']
+  active_leagues = [
+    '54166', # Regionsliga Süd Herren
+    '54167', # Regionsliga Mixed
+    '54149', # Landesliga weiblich U18
+    '54170', # Regionsliga Nord mU18
+    '54780', # Regionsliga Süd mU16
+    '54175', # Regionsliga wU16
+    '54179', # Regionsliga Süd mU14
+    '54180', # Regionsliga wU14
+    '54185', # Regionsliga Südost mU12
+    '54188'  # Regionsliga Süd U10
+  ]
+
+  [params.league_labels]
+    54166 = 'Herren'
+    54167 = 'Mixed'
+    54149 = 'wU18'
+    54170 = 'mU18'
+    54780 = 'mU16'
+    54175 = 'wU16'
+    54179 = 'mU14'
+    54180 = 'wU14'
+    54185 = 'mU12'
+    54188 = 'U10 Mixed'
   
   # Social Media & Externe Links
   instagram = 'https://www.instagram.com/bgbiba/'
