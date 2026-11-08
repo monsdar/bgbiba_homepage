@@ -1486,75 +1486,6 @@
     text-underline-offset: 4px;
   }
 
-  /* Cookie Banner (#111111 Dark Surface) */
-  .cookie-banner {
-    position: fixed;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    max-width: 440px;
-    background: var(--biba-bg-dark);
-    color: var(--biba-white);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    border-top: 4px solid var(--biba-red);
-    border-radius: var(--border-radius);
-    box-shadow: var(--shadow-lg);
-    padding: 1.5rem;
-    z-index: 9999;
-    display: none;
-    animation: slideUp 0.3s ease-out;
-  }
-
-  .cookie-banner.show {
-    display: block;
-  }
-
-  .cookie-banner h3 {
-    color: var(--biba-white);
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-  }
-
-  .cookie-banner p {
-    font-size: 0.85rem;
-    color: #e5e5e5;
-    line-height: 1.5;
-    margin-bottom: 1.25rem;
-  }
-
-  /* Contrast rule: No red body text on #111111 */
-  .cookie-banner a {
-    color: var(--biba-white);
-    font-weight: 600;
-    text-decoration: underline;
-    text-decoration-color: var(--biba-red);
-    text-underline-offset: 3px;
-  }
-
-  .cookie-actions {
-    display: flex;
-    gap: 0.75rem;
-  }
-
-  .cookie-actions .btn {
-    font-size: 0.85rem;
-    padding: 0.5rem 1rem;
-    flex: 1;
-  }
-
-  @keyframes slideUp {
-    from {
-      transform: translateY(20px);
-      opacity: 0;
-    }
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
-  }
-
   /* Instagram News & Feed Component Styles */
   .instagram-news-wrapper {
     margin-top: 1.5rem;
@@ -2417,13 +2348,6 @@
 
     .topbar-stammvereine {
       display: none;
-    }
-
-    .cookie-banner {
-      left: 1rem;
-      right: 1rem;
-      bottom: 1rem;
-      max-width: none;
     }
   }
 }

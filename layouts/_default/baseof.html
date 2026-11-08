@@ -36,6 +36,23 @@
   </main>
 
   {{ partial "footer.html" . }}
-  {{ partial "cookie-banner.html" . }}
+
+  <script>
+    (function() {
+      var navToggle = document.getElementById('mobile-nav-toggle');
+      var nav = document.getElementById('main-nav');
+      if (navToggle && nav) {
+        navToggle.addEventListener('click', function() {
+          nav.classList.toggle('active');
+        });
+      }
+    })();
+  </script>
+
+  {{- if and hugo.IsProduction (not hugo.IsServer) }}
+  <!-- GoatCounter Analytics (nur im Production-Build aktiv) -->
+  <script data-goatcounter="https://bgbiba.goatcounter.com/count"
+          async src="//gc.zgo.at/count.js"></script>
+  {{- end }}
 </body>
 </html>

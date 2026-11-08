@@ -22,8 +22,7 @@ Die Website basiert auf **Hugo (Extended)** und ist für ein schnelles, sicheres
   * 100 % DSGVO-konform: Bilder und Texte werden beim Build statisch gerendert – kein fremdes Skript und keine Meta-Cookies für Besucher.
   * Interaktives, barrierefreies Lightbox-Modal zum Lesen des vollständigen Beitrags und direktem Link zu Instagram.
 * **DSGVO & Datenschutzkonformität:**
-  * Modernes Cookie-Banner mit Opt-In: Google Analytics 4 (GA4) wird erst nach ausdrücklicher Einwilligung des Nutzers geladen.
-  * Einwilligungen werden lokal gespeichert und können jederzeit über die Datenschutzerklärung bzw. den Footer geändert oder widerrufen werden.
+  * Cookie-freie Webanalyse via **GoatCounter** (nur im Production-Build aktiv, kein Cookie-Banner erforderlich).
   * Vollständiges, deutsches Impressum und Datenschutzerklärung.
 * **Modernes Athletic Design System (Vanilla CSS):**
   * Maßgeschneidertes, responsives Design mit BiBA-Vereinsfarben (Marineblau, Basketball-Orange).
@@ -56,7 +55,7 @@ Die Website basiert auf **Hugo (Extended)** und ist für ein schnelles, sicheres
 │   └── verein.md           # Über die BG BiBA & Stammvereine
 ├── layouts/
 │   ├── _default/           # Baseof, Single und List Templates
-│   ├── partials/           # Header, Footer, Cookie-Banner, TeamSL Matches & Standings
+│   ├── partials/           # Header, Footer, TeamSL Matches & Standings
 │   ├── shortcodes/         # BookStack und TeamSL Shortcodes
 │   └── index.html          # Startseiten-Layout
 ├── static/                 # Statische Dateien (Logos, Icons, etc.)
@@ -90,9 +89,6 @@ BS_SECRET=dein_bookstack_token_secret
 
 # TeamSL API Token
 SLAPI_TOKEN=dein_teamsl_api_token
-
-# Optional: Google Analytics ID
-GA_MEASUREMENT_ID=G-XXXXXXXXXX
 ```
 > **Hinweis:** Die `.env` Datei wird durch `.gitignore` geschützt und niemals in Git übertragen. Fehlen die Variablen lokal, nutzt Hugo automatisch sichere Fallbacks (Mock-Daten und Vorschau-Texte), sodass der lokale Server jederzeit lauffähig bleibt.
 
@@ -120,7 +116,6 @@ Damit GitHub Actions die externen Inhalte im Live-Betrieb laden kann, müssen im
 | `BS_ID` | BookStack API Token ID | `ANUwocdx...` |
 | `BS_SECRET` | BookStack API Token Secret | `ENKb2cI2...` |
 | `SLAPI_TOKEN` | TeamSL DBB API Bearer Token | `89917e76-3e85-...` |
-| `GA_MEASUREMENT_ID` | Google Analytics 4 ID *(optional)* | `G-XXXXXXXXXX` |
 
 Unter **Settings → Pages** muss als Source **GitHub Actions** gewählt werden.
 

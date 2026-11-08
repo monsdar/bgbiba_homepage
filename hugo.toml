@@ -9,7 +9,7 @@ timeout = '60s'
 [security]
   enableInlineShortcodes = false
   [security.funcs]
-    getenv = ['^BS_', '^SLAPI_', '^TEAMSL_', '^GA_', '^INSTAGRAM_', '^IG_']
+    getenv = ['^BS_', '^SLAPI_', '^TEAMSL_', '^INSTAGRAM_', '^IG_']
   [security.http]
     methods = ['(?i)GET']
     urls = ['.*']

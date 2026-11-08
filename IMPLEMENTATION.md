@@ -23,7 +23,7 @@ Dieses Dokument beschreibt die Architektur, Designentscheidungen und technischen
      [security]
        enableInlineShortcodes = false
        [security.funcs]
-         getenv = ['^BS_', '^SLAPI_', '^TEAMSL_', '^GA_']
+         getenv = ['^BS_', '^SLAPI_', '^TEAMSL_', '^INSTAGRAM_', '^IG_']
        [security.http]
          methods = ['(?i)GET']
          urls = ['.*']
@@ -81,22 +81,10 @@ Dieses Dokument beschreibt die Architektur, Designentscheidungen und technischen
 
 ---
 
-### 2.3 Cookie-Banner & Google Analytics (`layouts/partials/cookie-banner.html`)
-* **DSGVO-Prinzip:** Kein Tracking-Skript vor ausdrücklicher Einwilligung (*Opt-In*).
+### 2.3 Datenschutzfreundliche Webanalyse via GoatCounter (`layouts/_default/baseof.html`)
+* **DSGVO-Prinzip:** Komplett Cookie-freie Reichweitenmessung ohne Speicherung personenbezogener Daten (kein Cookie-Banner erforderlich).
 * **Funktionsweise:**
-  1. Beim Seitenaufruf wird `localStorage.getItem('bgbiba_cookie_consent')` geprüft.
-  2. Ist kein Status vorhanden, blendet sich das modale Banner verzögert ein.
-  3. Bei Klick auf *„Alle akzeptieren“* wird das Consent-Token gespeichert und das GA4-Tag dynamisch in den `<head>` injiziert:
-     ```javascript
-     function loadGoogleAnalytics(id) {
-       var script = document.createElement('script');
-       script.async = true;
-       script.src = 'https://www.googletagmanager.com/gtag/js?id=' + id;
-       document.head.appendChild(script);
-       // gtag Initialisierung mit anonymize_ip: true
-     }
-     ```
-  4. Über den globalen Aufruf `openCookieSettings()` im Footer kann der Nutzer die Auswahl jederzeit revidieren.
+  * Das GoatCounter-Skript (`https://bgbiba.goatcounter.com/count`) wird in `baseof.html` über `{{- if and hugo.IsProduction (not hugo.IsServer) }}` ausschließlich im Production-Build eingebunden, sodass lokale Entwicklungsserver (`hugo server`) keine Zugriffe zählen.
 
 ---
 
@@ -142,7 +130,6 @@ Der Workflow ist für GitHub Pages und dynamische Content-Quellen optimiert:
     BS_ID: ${{ secrets.BS_ID }}
     BS_SECRET: ${{ secrets.BS_SECRET }}
     SLAPI_TOKEN: ${{ secrets.SLAPI_TOKEN }}
-    GA_MEASUREMENT_ID: ${{ secrets.GA_MEASUREMENT_ID }}
     INSTAGRAM_TOKEN: ${{ env.ACTIVE_IG_TOKEN || secrets.INSTAGRAM_TOKEN }}
   run: |
     hugo --minify --baseURL "${{ steps.pages.outputs.base_url }}/"

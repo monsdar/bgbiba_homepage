@@ -35,10 +35,10 @@ Spielpläne und Tabellen werden zur Build-Zeit über unsere TeamSL-API-Schnittst
 
 ---
 
-## 4. Analyse-Tools: Google Analytics (nur mit Einwilligung)
+## 4. Datenschutzfreundliche Reichweitenmessung (GoatCounter)
 
-Diese Website nutzt Funktionen des Webanalysedienstes Google Analytics, sofern du im Cookie-Banner dem statistischen Tracking zugestimmt hast. Anbieter ist die Google Ireland Limited („Google“), Gordon House, Barrow Street, Dublin 4, Irland.
+Diese Website nutzt den Open-Source-Webanalysedienst **GoatCounter** (`bgbiba.goatcounter.com`), um anonymisierte Zugriffsstatistiken (z. B. aufgerufene Unterseiten, Referrer, Browsertyp und ungefähre Region) zur Optimierung unseres Vereinsangebots auszuwerten.
 
-* **Rechtsgrundlage:** Die Nutzung erfolgt ausschließlich auf Grundlage deiner Einwilligung gemäß Art. 6 Abs. 1 lit. a DSGVO und § 25 Abs. 1 TTDSG.
-* **IP-Anonymisierung:** Auf dieser Website ist die IP-Anonymisierung aktiviert. Deine IP-Adresse wird von Google innerhalb von Mitgliedstaaten der Europäischen Union vor der Übertragung gekürzt.
-* **Widerruf:** Du kannst deine Einwilligung jederzeit über die [Cookie-Einstellungen](javascript:void(0)" onclick="openCookieSettings()) mit Wirkung für die Zukunft anpassen oder widerrufen.
+* **Keine Cookies & kein Tracking:** GoatCounter speichert **keine Cookies** oder sonstigen Daten im Browser deines Endgeräts und erstellt keine personenbezogenen Nutzerprofile. IP-Adressen werden nicht dauerhaft gespeichert.
+* **Rechtsgrundlage:** Die Verarbeitung erfolgt ohne Cookies und ohne personenbezogene Identifizierbarkeit auf Grundlage unseres berechtigten Interesses an einer datenschutzfreundlichen statistischen Auswertung unseres Webangebots gemäß Art. 6 Abs. 1 lit. f DSGVO.
+* Weitere Informationen zum Datenschutz bei GoatCounter findest du unter: [https://www.goatcounter.com/help/privacy](https://www.goatcounter.com/help/privacy).

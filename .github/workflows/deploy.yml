@@ -72,11 +72,10 @@ jobs:
 
       - name: Build with Hugo
         env:
-          # Externe Secrets für BookStack, TeamSL API, Instagram und Analytics
+          # Externe Secrets für BookStack, TeamSL API und Instagram
           BS_ID: ${{ secrets.BS_ID }}
           BS_SECRET: ${{ secrets.BS_SECRET }}
           SLAPI_TOKEN: ${{ secrets.SLAPI_TOKEN }}
-          GA_MEASUREMENT_ID: ${{ secrets.GA_MEASUREMENT_ID }}
           INSTAGRAM_TOKEN: ${{ env.ACTIVE_IG_TOKEN || secrets.INSTAGRAM_TOKEN }}
         run: |
           echo "=== Prüfe Verfügbarkeit der externen Secrets ==="
