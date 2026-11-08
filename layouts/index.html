@@ -51,12 +51,10 @@
 
     <div class="matches-overview-grid">
       <div>
-        <h3 class="matches-col-heading">Letzte Ergebnisse</h3>
-        {{ partial "teamsl-matches.html" (dict "limit" 4 "only_biba" true "filter" "finished" "title" "Letzte Ergebnisse") }}
+        {{ partial "teamsl-matches.html" (dict "limit" 4 "only_biba" true "filter" "finished" "title" "Ergebnisse") }}
       </div>
       <div>
-        <h3 class="matches-col-heading">Kommende Spiele</h3>
-        {{ partial "teamsl-matches.html" (dict "limit" 4 "only_biba" true "filter" "upcoming" "title" "Kommende Spiele") }}
+        {{ partial "teamsl-matches.html" (dict "limit" 4 "only_biba" true "filter" "upcoming" "title" "Upcoming") }}
       </div>
     </div>
   </div>
