@@ -2,9 +2,9 @@
 title: "Damen"
 description: "Basketball für Einsteigerinnen: Grundlagen lernen, gemeinsam trainieren und einen möglichen Spielbetrieb vorbereiten."
 category: "Senioren"
-icon: "⚡"
+icon: "♀️"
 email: "damen@bgbiba.net"
-weight: 60
+weight: 55
 ---
 
 ## Über das Team

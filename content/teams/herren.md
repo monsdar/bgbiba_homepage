@@ -2,9 +2,9 @@
 title: "Herren"
 description: "Ambitionierter Erwachsenen-Basketball auf höherem Niveau im regulären Ligaspielbetrieb."
 category: "Senioren"
-icon: "🔥"
+icon: "♂️"
 email: "herren@bgbiba.net"
-weight: 70
+weight: 95
 ---
 
 ## Über das Team

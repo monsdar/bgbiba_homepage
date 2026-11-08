@@ -2,9 +2,9 @@
 title: "Daddeltruppe (Freizeit)"
 description: "Lockerer Freizeit-Basketball ohne Ligaspielbetrieb für alle, die einfach regelmäßig in der Halle zocken wollen."
 category: "Freizeit"
-icon: "🎉"
+icon: "👫"
 email: "freizeit@bgbiba.net"
-weight: 90
+weight: 130
 ---
 
 ## Über das Team

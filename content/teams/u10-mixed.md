@@ -2,7 +2,7 @@
 title: "U10 Mixed (Minis)"
 description: "Jahrgang 2017/2018 – Spielerischer Basketball-Einstieg für Kinder bis 10 Jahre mit ersten Erfahrungen bei Miniturnieren und Freundschaftsspielen."
 category: "Minis"
-icon: "🏀"
+icon: "👫"
 email: "u10@bgbiba.net"
 weight: 10
 ---

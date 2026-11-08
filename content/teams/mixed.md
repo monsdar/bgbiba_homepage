@@ -2,9 +2,9 @@
 title: "Mixed"
 description: "Gemeinsam im Ligaspielbetrieb: Unser Mixed-Team für Damen mit Liga-Ambitionen und Herren auf der Suche nach Spielpraxis."
 category: "Senioren"
-icon: "🤝"
+icon: "👫"
 email: "mixed@bgbiba.net"
-weight: 80
+weight: 110
 ---
 
 ## Über das Team
