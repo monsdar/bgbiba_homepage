@@ -14,6 +14,24 @@ timeout = '60s'
     methods = ['(?i)GET']
     urls = ['.*']
 
+# Ordner-Mounts: Bindet den Root-Ordner "slideshow/" dynamisch in Hugo Assets ein
+[module]
+  [[module.mounts]]
+    source = 'content'
+    target = 'content'
+  [[module.mounts]]
+    source = 'static'
+    target = 'static'
+  [[module.mounts]]
+    source = 'layouts'
+    target = 'layouts'
+  [[module.mounts]]
+    source = 'assets'
+    target = 'assets'
+  [[module.mounts]]
+    source = 'slideshow'
+    target = 'assets/slideshow'
+
 
 
 [params]

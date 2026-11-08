@@ -1,0 +1,199 @@
+{{- /* Dynamische Hero-Diashow: Lädt alle Bilder aus slideshow/ (via Hugo Mount in assets/slideshow/) */ -}}
+{{- $rawImages := resources.Match "slideshow/*" -}}
+{{- $slides := slice -}}
+{{- range $rawImages -}}
+  {{- if eq .ResourceType "image" -}}
+    {{- $slides = $slides | append . -}}
+  {{- end -}}
+{{- end -}}
+
+{{- if gt (len $slides) 0 -}}
+{{- $total := len $slides -}}
+<div class="hero-slideshow" role="region" aria-roledescription="Diashow" aria-label="Impressionen aus dem Vereinsleben der BG BiBA" data-hero-slideshow>
+  <div class="hero-slideshow-stage">
+    {{- range $idx, $img := $slides -}}
+      {{- $isFirst := eq $idx 0 -}}
+      {{- /* Automatische Bildoptimierung via Hugo Pipes (WebP + Fallback) */ -}}
+      {{- $webp := $img -}}
+      {{- $fallback := $img -}}
+      {{- if gt $img.Width 1000 -}}
+        {{- $webp = $img.Resize "1000x webp q82" -}}
+        {{- $fallback = $img.Resize "1000x q85" -}}
+      {{- else -}}
+        {{- $webp = $img.Resize (printf "%dx webp q82" $img.Width) -}}
+      {{- end -}}
+
+      <div class="hero-slide{{ if $isFirst }} is-active{{ end }}"
+           role="group"
+           aria-roledescription="Folie"
+           aria-label="Bild {{ add $idx 1 }} von {{ $total }}"
+           aria-hidden="{{ if $isFirst }}false{{ else }}true{{ end }}"
+           data-slide-index="{{ $idx }}">
+        <picture>
+          <source srcset="{{ $webp.RelPermalink }}" type="image/webp">
+          <img src="{{ $fallback.RelPermalink }}"
+               alt="BG BiBA Basketball – Impression {{ add $idx 1 }}"
+               width="{{ $fallback.Width }}"
+               height="{{ $fallback.Height }}"
+               class="hero-slide-img"
+               {{- if $isFirst }}
+               fetchpriority="high"
+               {{- else }}
+               fetchpriority="low"
+               loading="lazy"
+               {{- end }}>
+        </picture>
+      </div>
+    {{- end -}}
+
+    <div class="hero-slideshow-overlay" aria-hidden="true"></div>
+
+    {{- if gt $total 1 -}}
+    <!-- Scoreboard-Style Counter Badge -->
+    <div class="hero-slideshow-counter" aria-hidden="true">
+      <span class="hero-slideshow-counter-current" data-slide-current>01</span>
+      <span class="hero-slideshow-counter-sep">/</span>
+      <span class="hero-slideshow-counter-total">{{ printf "%02d" $total }}</span>
+    </div>
+
+    <!-- Vor / Zurück Steuerung -->
+    <div class="hero-slideshow-nav">
+      <button type="button" class="hero-slideshow-btn" data-slide-prev aria-label="Vorheriges Bild">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </button>
+      <button type="button" class="hero-slideshow-btn" data-slide-next aria-label="Nächstes Bild">
+        <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Fortschritts-Indikatoren -->
+    <div class="hero-slideshow-dots" role="tablist" aria-label="Folie auswählen">
+      {{- range $idx, $_ := $slides -}}
+        <button type="button"
+                role="tab"
+                class="hero-slideshow-dot{{ if eq $idx 0 }} is-active{{ end }}"
+                aria-label="Bild {{ add $idx 1 }} anzeigen"
+                aria-selected="{{ if eq $idx 0 }}true{{ else }}false{{ end }}"
+                data-slide-to="{{ $idx }}">
+          <span class="hero-slideshow-dot-fill"></span>
+        </button>
+      {{- end -}}
+    </div>
+    {{- end -}}
+  </div>
+</div>
+
+{{- if gt $total 1 -}}
+<script>
+  (() => {
+    const root = document.querySelector('[data-hero-slideshow]');
+    if (!root) return;
+
+    const slides = Array.from(root.querySelectorAll('[data-slide-index]'));
+    const dots = Array.from(root.querySelectorAll('[data-slide-to]'));
+    const prevBtn = root.querySelector('[data-slide-prev]');
+    const nextBtn = root.querySelector('[data-slide-next]');
+    const currentEl = root.querySelector('[data-slide-current]');
+    const total = slides.length;
+    if (total <= 1) return;
+
+    let activeIndex = 0;
+    let timer = null;
+    const INTERVAL_MS = 5000;
+    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)');
+
+    const pad = (n) => String(n).padStart(2, '0');
+
+    const goTo = (index) => {
+      activeIndex = (index + total) % total;
+      slides.forEach((slide, idx) => {
+        const isCurrent = idx === activeIndex;
+        slide.classList.toggle('is-active', isCurrent);
+        slide.setAttribute('aria-hidden', isCurrent ? 'false' : 'true');
+      });
+      dots.forEach((dot, idx) => {
+        const isCurrent = idx === activeIndex;
+        dot.classList.toggle('is-active', isCurrent);
+        dot.setAttribute('aria-selected', isCurrent ? 'true' : 'false');
+      });
+      if (currentEl) {
+        currentEl.textContent = pad(activeIndex + 1);
+      }
+    };
+
+    const stopAuto = () => {
+      if (timer) {
+        clearInterval(timer);
+        timer = null;
+      }
+    };
+
+    const startAuto = () => {
+      stopAuto();
+      if (prefersReducedMotion.matches) return;
+      timer = setInterval(() => {
+        goTo(activeIndex + 1);
+      }, INTERVAL_MS);
+    };
+
+    if (prevBtn) {
+      prevBtn.addEventListener('click', () => {
+        goTo(activeIndex - 1);
+        startAuto();
+      });
+    }
+
+    if (nextBtn) {
+      nextBtn.addEventListener('click', () => {
+        goTo(activeIndex + 1);
+        startAuto();
+      });
+    }
+
+    dots.forEach((dot) => {
+      dot.addEventListener('click', () => {
+        const target = Number(dot.getAttribute('data-slide-to'));
+        if (!Number.isNaN(target)) {
+          goTo(target);
+          startAuto();
+        }
+      });
+    });
+
+    root.addEventListener('mouseenter', stopAuto);
+    root.addEventListener('mouseleave', startAuto);
+    root.addEventListener('focusin', stopAuto);
+    root.addEventListener('focusout', (e) => {
+      if (!root.contains(e.relatedTarget)) startAuto();
+    });
+
+    root.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        goTo(activeIndex - 1);
+        startAuto();
+      } else if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        goTo(activeIndex + 1);
+        startAuto();
+      }
+    });
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.hidden) {
+        stopAuto();
+      } else {
+        startAuto();
+      }
+    });
+
+    startAuto();
+  })();
+</script>
+{{- end -}}
+{{- end -}}
+
