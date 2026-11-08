@@ -21,11 +21,11 @@ timeout = '60s'
   club_name = 'Basketballgemeinschaft Bierden-Bassen-Achim'
   short_name = 'BG BiBA'
   contact_email = 'info@bgbiba.net'
-  logo = '/images/bgbiba_full_small.png'
-  logo_dark = '/images/bgbiba_full_black_white.png'
-  logo_tiny = '/images/bgbiba_full_tiny.png'
-  logo_svg = '/images/bgbiba_full.svg'
-  logo_dark_svg = '/images/bgbiba_full_black_white.svg'
+  logo = 'images/bgbiba_full_small.png'
+  logo_dark = 'images/bgbiba_full_black_white.png'
+  logo_tiny = 'images/bgbiba_full_tiny.png'
+  logo_svg = 'images/bgbiba_full.svg'
+  logo_dark_svg = 'images/bgbiba_full_black_white.svg'
   
   # Externe URLs & Services
   bookstack_url = 'https://wiki.bgbiba.de'
@@ -43,18 +43,6 @@ timeout = '60s'
     '54185', # Regionsliga Südost mU12
     '54188'  # Regionsliga Süd U10
   ]
-
-  [params.league_labels]
-    54166 = 'Herren'
-    54167 = 'Mixed'
-    54149 = 'wU18'
-    54170 = 'mU18'
-    54780 = 'mU16'
-    54175 = 'wU16'
-    54179 = 'mU14'
-    54180 = 'wU14'
-    54185 = 'mU12'
-    54188 = 'U10 Mixed'
   
   # Social Media & Externe Links
   instagram = 'https://www.instagram.com/bgbiba/'
@@ -70,6 +58,18 @@ timeout = '60s'
     { name = 'TSV Bassen e.V.', url = 'https://tsv-bassen.de' },
     { name = 'TSV Achim 1860 e.V.', url = 'https://tsv-achim.de' }
   ]
+
+  [params.league_labels]
+    54166 = 'Herren'
+    54167 = 'Mixed'
+    54149 = 'wU18'
+    54170 = 'mU18'
+    54780 = 'mU16'
+    54175 = 'wU16'
+    54179 = 'mU14'
+    54180 = 'wU14'
+    54185 = 'mU12'
+    54188 = 'U10 Mixed'
 
 # Navigation
 [[menu.main]]

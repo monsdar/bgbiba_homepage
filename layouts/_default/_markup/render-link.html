@@ -1,0 +1,3 @@
+{{- $dest := .Destination -}}
+{{- $isExternal := or (strings.HasPrefix $dest "http://") (strings.HasPrefix $dest "https://") (strings.HasPrefix $dest "mailto:") (strings.HasPrefix $dest "tel:") (strings.HasPrefix $dest "#") (strings.HasPrefix $dest "javascript:") -}}
+<a href="{{ if $isExternal }}{{ $dest | safeURL }}{{ else }}{{ strings.TrimPrefix "/" $dest | relURL }}{{ end }}"{{ with .Title }} title="{{ . }}"{{ end }}{{ if or (strings.HasPrefix $dest "http://") (strings.HasPrefix $dest "https://") }} target="_blank" rel="noopener noreferrer"{{ end }}>{{ .Text | safeHTML }}</a>{{- "" -}}

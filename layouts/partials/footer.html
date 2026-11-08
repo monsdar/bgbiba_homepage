@@ -2,7 +2,7 @@
   <div class="container">
     <div class="footer-grid">
       <div class="footer-brand">
-        <img src="{{ site.Params.logo_dark }}" alt="{{ site.Title }} Logo" class="footer-logo" width="56" height="56">
+        <img src="{{ strings.TrimPrefix "/" site.Params.logo_dark | relURL }}" alt="{{ site.Title }} Logo" class="footer-logo" width="56" height="56">
         <p>{{ site.Params.description }}</p>
         <div class="footer-socials">
           <a href="{{ site.Params.instagram }}" target="_blank" rel="noopener" class="btn btn-secondary btn-sm">Instagram</a>
@@ -14,10 +14,10 @@
       <div class="footer-col">
         <h4>Navigation</h4>
         <ul class="footer-links">
-          <li><a href="/">Startseite</a></li>
-          <li><a href="/teams/">Teams</a></li>
-          <li><a href="/mitglied-werden/">Mitglied werden</a></li>
-          <li><a href="/kontakt/">Kontakt</a></li>
+          <li><a href="{{ "" | relURL }}">Startseite</a></li>
+          <li><a href="{{ "teams/" | relURL }}">Teams</a></li>
+          <li><a href="{{ "mitglied-werden/" | relURL }}">Mitglied werden</a></li>
+          <li><a href="{{ "kontakt/" | relURL }}">Kontakt</a></li>
           <li><a href="{{ site.Params.wiki }}" target="_blank" rel="noopener noreferrer">Vereins-Wiki ↗</a></li>
           <li><a href="{{ site.Params.foerderverein }}" target="_blank" rel="noopener noreferrer">Förderverein ↗</a></li>
           <li><a href="{{ site.Params.fanshop }}" target="_blank" rel="noopener noreferrer">Fanshop ↗</a></li>
@@ -36,8 +36,8 @@
       <div class="footer-col">
         <h4>Rechtliches</h4>
         <ul class="footer-links">
-          <li><a href="/impressum/">Impressum</a></li>
-          <li><a href="/datenschutz/">Datenschutz</a></li>
+          <li><a href="{{ "impressum/" | relURL }}">Impressum</a></li>
+          <li><a href="{{ "datenschutz/" | relURL }}">Datenschutz</a></li>
           <li><a href="javascript:void(0)" onclick="openCookieSettings()">Cookie-Einstellungen</a></li>
         </ul>
       </div>
@@ -46,8 +46,8 @@
     <div class="footer-bottom">
       <p>&copy; {{ now.Format "2006" }} {{ site.Params.club_name }}. Alle Rechte vorbehalten.</p>
       <div class="footer-bottom-links">
-        <a href="/impressum/">Impressum</a>
-        <a href="/datenschutz/">Datenschutz</a>
+        <a href="{{ "impressum/" | relURL }}">Impressum</a>
+        <a href="{{ "datenschutz/" | relURL }}">Datenschutz</a>
       </div>
     </div>
   </div>

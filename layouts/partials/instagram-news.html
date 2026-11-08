@@ -175,7 +175,7 @@
 
       <div class="modal-info-col">
         <div class="modal-account-header">
-          <img src="/images/bgbiba_full_small.png" alt="BG BiBA Logo" class="modal-account-avatar" width="48" height="48" />
+          <img src="{{ strings.TrimPrefix "/" (site.Params.logo | default "images/bgbiba_full_small.png") | relURL }}" alt="BG BiBA Logo" class="modal-account-avatar" width="48" height="48" />
           <div class="modal-account-meta">
             <strong id="modal-post-title">bgbiba</strong>
             <span class="modal-post-date" id="modal-date-display"></span>

@@ -15,8 +15,8 @@
 <!-- Main Header -->
 <header class="header">
   <div class="container">
-    <a href="{{ site.BaseURL }}" class="brand">
-      <img src="{{ site.Params.logo }}" alt="{{ site.Title }} Logo" class="brand-logo" width="48" height="48">
+    <a href="{{ "" | relURL }}" class="brand">
+      <img src="{{ strings.TrimPrefix "/" site.Params.logo | relURL }}" alt="{{ site.Title }} Logo" class="brand-logo" width="48" height="48">
       <div class="brand-text">
         <span class="brand-title">{{ site.Params.short_name }}</span>
         <span class="brand-subtitle">Basketball</span>
@@ -31,13 +31,13 @@
       <ul class="nav-list">
         {{ range site.Menus.main }}
           <li>
-            <a href="{{ .URL }}" class="nav-link {{ if or ($.IsMenuCurrent "main" .) ($.HasMenuCurrent "main" .) (and (eq .URL "/teams/") (eq $.Section "teams")) (and (eq .URL "/mitglied-werden/") (strings.HasPrefix $.RelPermalink "/mitglied-werden")) }}active{{ end }}" {{ if strings.HasPrefix .URL "http" }}target="_blank" rel="noopener noreferrer"{{ end }}>
+            <a href="{{ strings.TrimPrefix "/" .URL | relURL }}" class="nav-link {{ if or ($.IsMenuCurrent "main" .) ($.HasMenuCurrent "main" .) (and (eq .URL "/teams/") (eq $.Section "teams")) (and (eq .URL "/mitglied-werden/") (strings.HasPrefix $.RelPermalink ("mitglied-werden" | relURL))) }}active{{ end }}" {{ if strings.HasPrefix .URL "http" }}target="_blank" rel="noopener noreferrer"{{ end }}>
               {{ .Name }}
             </a>
           </li>
         {{ end }}
       </ul>
-      <a href="/kontakt/" class="btn-nav-cta">
+      <a href="{{ "kontakt/" | relURL }}" class="btn-nav-cta">
         ✉️ Kontakt
       </a>
     </nav>
