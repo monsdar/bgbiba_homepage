@@ -71,7 +71,6 @@ timeout = '60s'
   whatsapp = 'https://whatsapp.com/channel/0029VaDSq8rG8l5D0u7auG3C'
   fanshop = 'https://bgbiba.fan12.de/'
   wiki = 'https://wiki.bgbiba.de/'
-  foerderverein = 'https://www.bgbiba.info/bballer4life/'
 
   # Stammvereine (nur im Footer verlinkt)
   stammvereine = [
@@ -122,13 +121,13 @@ timeout = '60s'
   weight = 30
 
 [[menu.main]]
-  name = 'Wiki ↗'
-  url = 'https://wiki.bgbiba.de/'
+  name = 'Förderverein'
+  url = '/foerderverein/'
   weight = 40
 
 [[menu.main]]
-  name = 'Förderverein ↗'
-  url = 'https://www.bgbiba.info/bballer4life/'
+  name = 'Wiki ↗'
+  url = 'https://wiki.bgbiba.de/'
   weight = 50
 
 [[menu.main]]

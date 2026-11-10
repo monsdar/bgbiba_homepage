@@ -283,12 +283,13 @@ Du möchtest nicht bis zur nächsten automatischen Aktualisierung warten? So sta
 3. Klicke rechts auf den grauen Button **„Run workflow"** und im kleinen Menü auf den grünen Button **„Run workflow"**.
 4. Nach ca. 1 Minute sind alle frischen Daten aus dem Wiki, von Instagram und aus TeamSL live auf der Homepage!
 
-### 3. Wo ändere ich Seiten wie „Mitglied werden", „Kontakt" oder „Impressum"?
+### 3. Wo ändere ich Seiten wie „Mitglied werden", „Förderverein", „Kontakt" oder „Impressum"?
 Alle allgemeinen Unterseiten liegen direkt im Ordner **`content/`**:
 * `content/mitglied-werden.md` → Seite „Mitglied werden"
+* `content/foerderverein.md` → Seite „Förderverein" (bindet die Wiki-Seite mit der ID `204` ein)
 * `content/kontakt.md` → Allgemeine Kontaktseite
 * `content/impressum.md` → Impressum (z. B. bei Vorstands- oder Adressänderungen)
 * `content/datenschutz.md` → Datenschutzerklärung
 
-### 4. Wo ändere ich globale Links (Fanshop, WhatsApp-Kanal, Förderverein)?
+### 4. Wo ändere ich globale Links (Fanshop, WhatsApp-Kanal, Social Media)?
 Falls sich einmal der Link zum Fanshop, zum WhatsApp-Kanal oder zu Social Media ändert, findest du diese gesammelt in der Datei **`hugo.toml`** (ab ca. Zeile 68 unter `# Social Media & Externe Links` sowie darunter unter `# Navigation`).
